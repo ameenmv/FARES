@@ -69,34 +69,31 @@ onMounted(() => {
   gsap.registerPlugin(ScrollTrigger)
 
   nextTick(() => {
-    const sectionEl = document.getElementById('contact-cta')
-
     // Divider line
     if (dividerRef.value) {
       lineDraw(dividerRef.value, {
         duration: 1,
-        scrollTrigger: { trigger: sectionEl, start: 'top 90%', toggleActions: 'play none none none' },
+        scrollTrigger: { trigger: dividerRef.value, start: 'top 95%', toggleActions: 'play none none none' },
       })
     }
 
-    // Heading — slides up
+    // Heading — trigger on the heading itself
     if (headingRef.value) {
       gsap.to(headingRef.value, {
         opacity: 1,
         y: 0,
         duration: 1,
         ease: 'power3.out',
-        scrollTrigger: { trigger: sectionEl, start: 'top 85%', toggleActions: 'play none none none' },
+        scrollTrigger: { trigger: headingRef.value, start: 'top 95%', toggleActions: 'play none none none' },
       })
     }
 
-    // Bottom row
+    // Bottom row — trigger on itself
     if (bottomRef.value) {
       gsap.to(bottomRef.value, {
         opacity: 1,
         duration: 0.8,
-        delay: 0.3,
-        scrollTrigger: { trigger: sectionEl, start: 'top 85%', toggleActions: 'play none none none' },
+        scrollTrigger: { trigger: bottomRef.value, start: 'top 95%', toggleActions: 'play none none none' },
       })
     }
 
@@ -107,15 +104,16 @@ onMounted(() => {
       if (cleanup) cleanups.push(cleanup)
     }
 
-    // Fallback
+    // Aggressive fallback — 2s
     setTimeout(() => {
-      if (headingRef.value && getComputedStyle(headingRef.value).opacity === '0') {
-        gsap.to(headingRef.value, { opacity: 1, y: 0, duration: 0.5 })
-      }
-      if (bottomRef.value && getComputedStyle(bottomRef.value).opacity === '0') {
-        gsap.to(bottomRef.value, { opacity: 1, duration: 0.5 })
-      }
-    }, 3000)
+      [headingRef, bottomRef].forEach((ref) => {
+        if (ref.value && parseFloat(getComputedStyle(ref.value).opacity) < 0.1) {
+          ref.value.style.opacity = '1'
+          ref.value.style.transform = 'none'
+          ref.value.style.transition = 'opacity 0.5s ease'
+        }
+      })
+    }, 2000)
   })
 })
 

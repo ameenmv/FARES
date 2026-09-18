@@ -100,18 +100,16 @@ onMounted(() => {
   gsap.registerPlugin(ScrollTrigger)
 
   nextTick(() => {
-    const footerEl = document.getElementById('footer')
-
-    // Subtitle
+    // Subtitle — trigger on itself
     if (subtitleRef.value) {
       gsap.to(subtitleRef.value, {
         opacity: 1,
         duration: 0.6,
-        scrollTrigger: { trigger: footerEl, start: 'top 95%', toggleActions: 'play none none none' },
+        scrollTrigger: { trigger: subtitleRef.value, start: 'top 98%', toggleActions: 'play none none none' },
       })
     }
 
-    // Heading text reveal
+    // Heading text reveal — trigger on itself
     if (headingRef.value) {
       splitTextReveal(headingRef.value, {
         type: 'words',
@@ -119,46 +117,48 @@ onMounted(() => {
         stagger: 0.05,
         from: { y: '100%', opacity: 0 },
         to: { y: '0%', opacity: 1 },
-        scrollTrigger: { trigger: footerEl, start: 'top 95%', toggleActions: 'play none none none' },
+        scrollTrigger: { trigger: headingRef.value, start: 'top 98%', toggleActions: 'play none none none' },
       })
     }
 
-    // CTA button
+    // CTA button — trigger on itself
     if (ctaBtnRef.value) {
       const ctaBtnEl = ctaBtnRef.value?.$el ?? ctaBtnRef.value
       gsap.to(ctaBtnEl, {
         opacity: 1,
         y: 0,
         duration: 0.8,
-        scrollTrigger: { trigger: footerEl, start: 'top 95%', toggleActions: 'play none none none' },
+        scrollTrigger: { trigger: ctaBtnEl, start: 'top 98%', toggleActions: 'play none none none' },
       })
       const cleanup = magneticElement(ctaBtnEl, 0.3)
       if (cleanup) cleanups.push(cleanup)
     }
 
-    // Footer info
+    // Footer info — trigger on itself
     if (footerInfoRef.value) {
       gsap.to(footerInfoRef.value, {
         opacity: 1,
         duration: 0.8,
-        scrollTrigger: { trigger: footerEl, start: 'top 95%', toggleActions: 'play none none none' },
+        scrollTrigger: { trigger: footerInfoRef.value, start: 'top 98%', toggleActions: 'play none none none' },
       })
     }
 
-    // Safety fallback: if triggers never fire, show everything after 3s
+    // Aggressive fallback — 2s
     setTimeout(() => {
-      [subtitleRef.value, footerInfoRef.value].forEach((el) => {
-        if (el && getComputedStyle(el).opacity === '0') {
-          gsap.to(el, { opacity: 1, duration: 0.4 })
-        }
-      })
-      if (ctaBtnRef.value) {
-        const btnEl = ctaBtnRef.value?.$el ?? ctaBtnRef.value
-        if (btnEl && getComputedStyle(btnEl).opacity === '0') {
-          gsap.to(btnEl, { opacity: 1, y: 0, duration: 0.4 })
+      const forceVisible = (el: HTMLElement | undefined) => {
+        if (!el) return
+        const target = (el as any)?.$el ?? el
+        if (parseFloat(getComputedStyle(target).opacity) < 0.1) {
+          target.style.opacity = '1'
+          target.style.transform = 'none'
+          target.style.transition = 'opacity 0.5s ease'
         }
       }
-    }, 3000)
+      forceVisible(subtitleRef.value)
+      forceVisible(headingRef.value)
+      forceVisible(footerInfoRef.value)
+      if (ctaBtnRef.value) forceVisible(ctaBtnRef.value?.$el ?? ctaBtnRef.value)
+    }, 2000)
   })
 })
 
