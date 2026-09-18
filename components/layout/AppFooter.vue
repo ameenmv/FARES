@@ -95,55 +95,88 @@ const ctaBtnRef = ref<HTMLElement>()
 const footerInfoRef = ref<HTMLElement>()
 
 const cleanups: (() => void)[] = []
+let footerTriggers: ScrollTrigger[] = []
 
-onMounted(() => {
-  gsap.registerPlugin(ScrollTrigger)
+function resetFooter() {
+  // Kill old triggers
+  footerTriggers.forEach((t) => t.kill())
+  footerTriggers = []
 
+  // Reset all element states
+  const resetEl = (el: HTMLElement | undefined, transform = false) => {
+    if (!el) return
+    const target = (el as any)?.$el ?? el
+    target.style.opacity = '0'
+    if (transform) target.style.transform = 'translateY(15px)'
+  }
+  resetEl(subtitleRef.value)
+  resetEl(footerInfoRef.value)
+  if (ctaBtnRef.value) {
+    const btn = (ctaBtnRef.value as any)?.$el ?? ctaBtnRef.value
+    if (btn) {
+      btn.style.opacity = '0'
+      btn.style.transform = 'translateY(15px)'
+    }
+  }
+
+  // Reset heading innerHTML (splitTextReveal modifies it)
+  if (headingRef.value) {
+    headingRef.value.innerHTML = `Let's Work<br /><span class="text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-zinc-600 animate-gradient">Together</span>`
+  }
+}
+
+function initFooterAnimations() {
   nextTick(() => {
-    // Subtitle — trigger on itself
+    // Subtitle
     if (subtitleRef.value) {
-      gsap.to(subtitleRef.value, {
-        opacity: 1,
-        duration: 0.6,
-        scrollTrigger: { trigger: subtitleRef.value, start: 'top 98%', toggleActions: 'play none none none' },
+      const st = ScrollTrigger.create({
+        trigger: subtitleRef.value,
+        start: 'top 98%',
+        onEnter: () => gsap.to(subtitleRef.value!, { opacity: 1, duration: 0.6 }),
       })
+      footerTriggers.push(st)
     }
 
-    // Heading text reveal — trigger on itself
+    // Heading text reveal
     if (headingRef.value) {
-      splitTextReveal(headingRef.value, {
-        type: 'words',
-        duration: 0.8,
-        stagger: 0.05,
-        from: { y: '100%', opacity: 0 },
-        to: { y: '0%', opacity: 1 },
-        scrollTrigger: { trigger: headingRef.value, start: 'top 98%', toggleActions: 'play none none none' },
+      const st = ScrollTrigger.create({
+        trigger: headingRef.value,
+        start: 'top 98%',
+        onEnter: () => {
+          splitTextReveal(headingRef.value!, {
+            type: 'words',
+            duration: 0.8,
+            stagger: 0.05,
+            from: { y: '100%', opacity: 0 },
+            to: { y: '0%', opacity: 1 },
+          })
+        },
       })
+      footerTriggers.push(st)
     }
 
-    // CTA button — trigger on itself
+    // CTA button
     if (ctaBtnRef.value) {
-      const ctaBtnEl = ctaBtnRef.value?.$el ?? ctaBtnRef.value
-      gsap.to(ctaBtnEl, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        scrollTrigger: { trigger: ctaBtnEl, start: 'top 98%', toggleActions: 'play none none none' },
+      const ctaBtnEl = (ctaBtnRef.value as any)?.$el ?? ctaBtnRef.value
+      const st = ScrollTrigger.create({
+        trigger: ctaBtnEl,
+        start: 'top 98%',
+        onEnter: () => gsap.to(ctaBtnEl, { opacity: 1, y: 0, duration: 0.8 }),
       })
-      const cleanup = magneticElement(ctaBtnEl, 0.3)
-      if (cleanup) cleanups.push(cleanup)
+      footerTriggers.push(st)
     }
 
-    // Footer info — trigger on itself
+    // Footer info
     if (footerInfoRef.value) {
-      gsap.to(footerInfoRef.value, {
-        opacity: 1,
-        duration: 0.8,
-        scrollTrigger: { trigger: footerInfoRef.value, start: 'top 98%', toggleActions: 'play none none none' },
+      const st = ScrollTrigger.create({
+        trigger: footerInfoRef.value,
+        start: 'top 98%',
+        onEnter: () => gsap.to(footerInfoRef.value!, { opacity: 1, duration: 0.8 }),
       })
+      footerTriggers.push(st)
     }
 
-    // Aggressive fallback — 2s
+    // Fallback — 2s
     setTimeout(() => {
       const forceVisible = (el: HTMLElement | undefined) => {
         if (!el) return
@@ -157,14 +190,38 @@ onMounted(() => {
       forceVisible(subtitleRef.value)
       forceVisible(headingRef.value)
       forceVisible(footerInfoRef.value)
-      if (ctaBtnRef.value) forceVisible(ctaBtnRef.value?.$el ?? ctaBtnRef.value)
+      if (ctaBtnRef.value) forceVisible((ctaBtnRef.value as any)?.$el ?? ctaBtnRef.value)
     }, 2000)
   })
+}
+
+const route = useRoute()
+
+onMounted(() => {
+  gsap.registerPlugin(ScrollTrigger)
+  initFooterAnimations()
+
+  // Magnetic button
+  if (ctaBtnRef.value) {
+    const ctaBtnEl = (ctaBtnRef.value as any)?.$el ?? ctaBtnRef.value
+    const cleanup = magneticElement(ctaBtnEl, 0.3)
+    if (cleanup) cleanups.push(cleanup)
+  }
+})
+
+// Re-init on every route change
+watch(() => route.fullPath, () => {
+  resetFooter()
+  // Wait for page transition to finish
+  setTimeout(() => {
+    ScrollTrigger.refresh()
+    initFooterAnimations()
+  }, 800)
 })
 
 onUnmounted(() => {
   cleanups.forEach((fn) => fn())
-  ScrollTrigger.getAll().forEach((t) => t.kill())
+  footerTriggers.forEach((t) => t.kill())
 })
 </script>
 
