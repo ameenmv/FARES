@@ -22,7 +22,7 @@
             class="text-xs font-mono text-zinc-400 tabular-nums"
             style="opacity: 0"
           >
-            2024
+            2026
           </span>
         </div>
 
