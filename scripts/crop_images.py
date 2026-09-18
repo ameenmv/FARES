@@ -148,6 +148,20 @@ def crop_cover_page(img, page_num):
     return [cropped]
 
 
+def is_mostly_white(img, threshold=0.70):
+    """Check if an image is mostly white (text page, not a design image)."""
+    w, h = img.size
+    total = 0
+    white = 0
+    for y in range(0, h, max(1, h // 15)):
+        for x in range(0, w, max(1, w // 15)):
+            r, g, b = img.getpixel((x, y))[:3]
+            total += 1
+            if r > WHITE_THRESHOLD and g > WHITE_THRESHOLD and b > WHITE_THRESHOLD:
+                white += 1
+    return (white / total) >= threshold
+
+
 def crop_detail_page(img, page_num):
     """Crop detail page: detect if it has 2 images or 1, and extract accordingly."""
     w, h = img.size
@@ -165,20 +179,49 @@ def crop_detail_page(img, page_num):
     gap_start, gap_end = find_vertical_gap(content, search_start, search_end)
     
     if gap_start is not None and gap_end is not None:
-        # Two-image layout - split into two
+        # Found a gap - split into left and right
         left_img = content.crop((0, 0, gap_start, ch))
         right_img = content.crop((gap_end, 0, cw, ch))
         
-        # Trim each sub-image
-        results = []
-        for sub_img in [left_img, right_img]:
-            sl, st, sr, sb = find_content_bounds(sub_img)
-            trimmed = sub_img.crop((sl, st, sr, sb))
-            # Only add if it has meaningful size
-            if trimmed.size[0] > 100 and trimmed.size[1] > 100:
-                results.append(trimmed)
+        left_is_text = is_mostly_white(left_img)
+        right_is_text = is_mostly_white(right_img)
         
-        return results if results else [content]
+        if left_is_text and not right_is_text:
+            # Text on left, image on right -> only keep right
+            # Use aggressive left trim: find where substantial image content begins
+            rw, rh = right_img.size
+            trim_left = 0
+            for x in range(rw):
+                col_pixels = [right_img.getpixel((x, y))[:3] for y in range(0, rh, max(1, rh // 20))]
+                non_white = sum(1 for p in col_pixels if not all(c > WHITE_THRESHOLD for c in p))
+                if non_white > len(col_pixels) * 0.3:  # >30% non-white = real image content
+                    trim_left = x
+                    break
+            # Also trim top/bottom/right whitespace
+            sl, st, sr, sb = find_content_bounds(right_img)
+            final_left = max(sl, trim_left)
+            trimmed = right_img.crop((final_left, st, sr, sb))
+            print(f"    [TEXT+IMAGE] Keeping right side only")
+            return [trimmed]
+        elif right_is_text and not left_is_text:
+            # Image on left, text on right -> only keep left
+            sl, st, sr, sb = find_content_bounds(left_img)
+            trimmed = left_img.crop((sl, st, sr, sb))
+            print(f"    [TEXT+IMAGE] Keeping left side only")
+            return [trimmed]
+        elif left_is_text and right_is_text:
+            # Both are text - skip this page entirely
+            print(f"    [SKIP] Both sides are text")
+            return []
+        else:
+            # Both are actual images - keep both
+            results = []
+            for sub_img in [left_img, right_img]:
+                sl, st, sr, sb = find_content_bounds(sub_img)
+                trimmed = sub_img.crop((sl, st, sr, sb))
+                if trimmed.size[0] > 100 and trimmed.size[1] > 100:
+                    results.append(trimmed)
+            return results if results else [content]
     else:
         # Single image - just return the trimmed content
         return [content]
