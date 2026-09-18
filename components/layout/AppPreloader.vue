@@ -145,10 +145,18 @@ onMounted(() => {
     '<'
   )
 
-  // Phase 4: Fade out all content
+  // Phase 4: Name slides back down (reverse of entrance)
+  tl.to(nameRef.value, {
+    y: '100%',
+    duration: 0.5,
+    ease: 'power3.in',
+  })
+
+  // Labels fade + scale simultaneously
   tl.to(
-    [nameRef.value, topLabelRef.value, yearRef.value, roleRef.value, counterRef.value, progressRef.value?.parentElement],
-    { opacity: 0, duration: 0.3, ease: 'power2.in' },
+    [topLabelRef.value, yearRef.value, roleRef.value, counterRef.value, progressRef.value?.parentElement],
+    { opacity: 0, y: -10, duration: 0.3, ease: 'power2.in' },
+    '<'
   )
 
   // Phase 5: Whole preloader slides up cleanly
