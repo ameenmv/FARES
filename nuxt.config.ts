@@ -29,6 +29,7 @@ export default defineNuxtConfig({
     families: {
       'Outfit': [300, 400, 500, 600, 700, 800, 900],
       'Inter': [300, 400, 500, 600, 700],
+      'Sora': [700, 800],
     },
     display: 'swap',
     preload: true,

@@ -1,13 +1,20 @@
 <template>
   <div v-if="project" class="pt-20">
+    <!-- Scroll Progress Bar -->
+    <div class="fixed top-0 left-0 right-0 h-[2px] bg-transparent z-[200]">
+      <div ref="progressBarRef" class="h-full bg-zinc-900 origin-left" style="transform: scaleX(0)" />
+    </div>
+
     <!-- Hero Image -->
     <section class="relative overflow-hidden" id="case-study-hero">
       <div class="container mx-auto px-6 lg:px-12 pt-12 pb-8">
         <!-- Back button -->
         <NuxtLink
+          ref="backBtnRef"
           to="/work"
           class="inline-flex items-center gap-2 text-sm font-medium text-zinc-400 hover:text-zinc-900 transition-colors duration-300 mb-8 group"
           id="back-to-work"
+          style="opacity: 0"
         >
           <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
@@ -16,14 +23,23 @@
         </NuxtLink>
       </div>
 
-      <!-- Hero Image -->
+      <!-- Hero Image with clip-path reveal + parallax -->
       <div class="container mx-auto px-6 lg:px-12">
-        <div ref="heroImageRef" class="rounded-3xl overflow-hidden aspect-[16/9] bg-zinc-100">
-          <img
-            :src="heroImage"
-            :alt="project.title"
-            class="w-full h-full object-cover"
-          />
+        <div
+          ref="heroImageRef"
+          class="rounded-3xl overflow-hidden aspect-[16/9] bg-zinc-100 cursor-pointer"
+          style="clip-path: inset(50% 50% 50% 50%)"
+          @click="openLightbox(0)"
+          data-cursor="View"
+        >
+          <div class="absolute inset-[-15%] w-[130%] h-[130%]">
+            <img
+              ref="heroImgEl"
+              :src="heroImage"
+              :alt="project.title"
+              class="w-full h-full object-cover"
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -32,9 +48,9 @@
     <section class="container mx-auto px-6 lg:px-12 py-16 md:py-24">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
         <!-- Metadata -->
-        <div ref="metaRef" class="lg:col-span-4 space-y-8">
+        <div ref="metaRef" class="lg:col-span-4 space-y-8" style="opacity: 0; transform: translateY(30px)">
           <div>
-            <h1 class="text-5xl md:text-6xl font-heading font-bold text-zinc-900 mb-4">
+            <h1 ref="projectTitleRef" class="text-5xl md:text-6xl font-heading font-bold text-zinc-900 mb-4">
               {{ project.title }}
             </h1>
             <div class="flex items-center gap-3">
@@ -47,7 +63,10 @@
             </div>
           </div>
 
-          <div class="space-y-4 pt-4 border-t border-zinc-100">
+          <!-- Horizontal line -->
+          <div ref="metaLineRef" class="h-[1px] bg-zinc-200" />
+
+          <div class="space-y-4">
             <div>
               <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-1">Industry</h4>
               <p class="text-sm font-medium text-zinc-700">{{ project.industry }}</p>
@@ -68,7 +87,7 @@
         </div>
 
         <!-- Description -->
-        <div ref="descRef" class="lg:col-span-8">
+        <div ref="descRef" class="lg:col-span-8" style="opacity: 0; transform: translateY(40px)">
           <div class="max-w-2xl">
             <h3 class="text-xs uppercase tracking-widest text-zinc-400 mb-4">Description</h3>
             <p class="text-xl md:text-2xl text-zinc-700 leading-relaxed font-light">
@@ -85,17 +104,27 @@
         <div
           v-for="(image, index) in detailImages"
           :key="index"
-          class="gallery-item rounded-2xl overflow-hidden bg-zinc-100"
+          class="gallery-item rounded-2xl overflow-hidden bg-zinc-100 cursor-pointer"
+          :style="{ clipPath: 'inset(8% 8% 8% 8%)', opacity: 0 }"
+          @click="openLightbox(index + 1)"
+          data-cursor="View"
         >
           <img
             :src="image"
             :alt="`${project.title} - Detail ${index + 1}`"
-            class="w-full h-full object-cover"
+            class="gallery-img w-full h-full object-cover"
             loading="lazy"
           />
         </div>
       </div>
     </section>
+
+    <!-- Image Lightbox -->
+    <SharedImageLightbox
+      v-model="lightboxOpen"
+      :images="allImages"
+      :start-index="lightboxStartIndex"
+    />
 
     <!-- Project Navigation -->
     <section class="border-t border-zinc-100" id="project-nav">
@@ -145,6 +174,8 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+const { splitTextReveal, parallaxImage, clipReveal, lineDraw } = useAnimations()
+
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
 
@@ -155,8 +186,17 @@ const nextProject = computed(() => getNextProject(slug.value))
 const previousProject = computed(() => getPreviousProject(slug.value))
 
 const heroImageRef = ref<HTMLElement>()
+const heroImgEl = ref<HTMLElement>()
 const metaRef = ref<HTMLElement>()
 const descRef = ref<HTMLElement>()
+const projectTitleRef = ref<HTMLElement>()
+const metaLineRef = ref<HTMLElement>()
+const backBtnRef = ref<HTMLElement>()
+const progressBarRef = ref<HTMLElement>()
+
+// Lightbox state
+const lightboxOpen = ref(false)
+const lightboxStartIndex = ref(0)
 
 const heroImage = computed(() => {
   if (!project.value) return ''
@@ -173,6 +213,17 @@ const detailImages = computed(() => {
   return images
 })
 
+// All images combined (hero + detail) for the lightbox
+const allImages = computed(() => {
+  if (!heroImage.value) return detailImages.value
+  return [heroImage.value, ...detailImages.value]
+})
+
+function openLightbox(index: number) {
+  lightboxStartIndex.value = index
+  lightboxOpen.value = true
+}
+
 useHead({
   title: computed(() => project.value?.title || 'Project'),
 })
@@ -181,47 +232,118 @@ function animateIn() {
   gsap.registerPlugin(ScrollTrigger)
 
   // Kill existing triggers
-  ScrollTrigger.getAll().forEach(t => t.kill())
+  ScrollTrigger.getAll().forEach((t) => t.kill())
 
   nextTick(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
+
+    // Scroll progress bar
+    if (progressBarRef.value) {
+      gsap.to(progressBarRef.value, {
+        scaleX: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: document.body,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.3,
+        },
+      })
+    }
+
+    // Back button
+    if (backBtnRef.value) {
+      tl.to(backBtnRef.value, { opacity: 1, duration: 0.5 })
+    }
+
+    // Hero image — clip-path reveal from center
     if (heroImageRef.value) {
-      gsap.fromTo(heroImageRef.value,
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
-      )
+      tl.to(heroImageRef.value, {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        duration: 1.4,
+        ease: 'power4.inOut',
+      }, '-=0.2')
     }
 
+    // Hero image parallax
+    if (heroImgEl.value) {
+      parallaxImage(heroImgEl.value, {
+        speed: 0.2,
+        trigger: heroImageRef.value as HTMLElement,
+      })
+    }
+
+    // Meta section
     if (metaRef.value) {
-      gsap.fromTo(metaRef.value,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: 'power3.out' }
-      )
+      tl.to(metaRef.value, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+      }, '-=0.6')
     }
 
+    // Project title split
+    if (projectTitleRef.value) {
+      tl.add(() => {
+        splitTextReveal(projectTitleRef.value!, {
+          type: 'chars',
+          duration: 0.5,
+          stagger: 0.02,
+        })
+      }, '<')
+    }
+
+    // Meta line draw
+    if (metaLineRef.value) {
+      tl.add(() => {
+        lineDraw(metaLineRef.value!)
+      }, '-=0.4')
+    }
+
+    // Description
     if (descRef.value) {
-      gsap.fromTo(descRef.value,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, delay: 0.3, ease: 'power3.out' }
-      )
+      tl.to(descRef.value, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+      }, '-=0.5')
     }
 
-    // Gallery items
+    // Gallery items — alternating reveal directions
     const galleryItems = document.querySelectorAll('.gallery-item')
-    galleryItems.forEach((item) => {
-      gsap.fromTo(item,
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 90%',
-            toggleActions: 'play none none none',
-          },
-        }
-      )
+    galleryItems.forEach((item, i) => {
+      const fromLeft = i % 2 === 0
+
+      gsap.to(item, {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        opacity: 1,
+        duration: 1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: item,
+          start: 'top 88%',
+          toggleActions: 'play none none none',
+        },
+      })
+
+      // Subtle parallax on gallery images
+      const galleryImg = item.querySelector('.gallery-img')
+      if (galleryImg) {
+        gsap.fromTo(
+          galleryImg,
+          { yPercent: -5 },
+          {
+            yPercent: 5,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: item,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1.5,
+            },
+          }
+        )
+      }
     })
   })
 }
@@ -239,6 +361,6 @@ watch(slug, () => {
 })
 
 onUnmounted(() => {
-  ScrollTrigger.getAll().forEach(t => t.kill())
+  ScrollTrigger.getAll().forEach((t) => t.kill())
 })
 </script>

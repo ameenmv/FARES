@@ -4,15 +4,17 @@
       <!-- Section header -->
       <div class="flex items-end justify-between mb-16">
         <div>
-          <span class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400 mb-3 block">(01)</span>
-          <h2 class="text-4xl md:text-5xl font-heading font-bold text-zinc-900">
+          <span ref="sectionNumRef" class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400 mb-3 block" style="opacity: 0">(01)</span>
+          <h2 ref="sectionTitleRef" class="text-4xl md:text-5xl font-heading font-bold text-zinc-900">
             Selected Work
           </h2>
         </div>
         <NuxtLink
+          ref="viewAllRef"
           to="/work"
-          class="hidden md:inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors duration-300 group"
+          class="magnetic-btn hidden md:inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors duration-300 group"
           id="view-all-work"
+          style="opacity: 0"
         >
           View All Projects
           <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,6 +22,9 @@
           </svg>
         </NuxtLink>
       </div>
+
+      <!-- Divider line draw -->
+      <div ref="dividerRef" class="h-[1px] bg-zinc-200 mb-16" />
 
       <!-- Projects Grid -->
       <div ref="gridRef" class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -33,13 +38,14 @@
           ]"
           :data-cursor="'View'"
           :id="`project-${project.slug}`"
+          style="clip-path: inset(8% 8% 8% 8%); opacity: 0"
         >
-          <!-- Project Image -->
-          <div class="absolute inset-0 overflow-hidden">
+          <!-- Project Image with parallax -->
+          <div class="absolute inset-[-15%] overflow-hidden">
             <img
               :src="getProjectImage(project)"
               :alt="project.title"
-              class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              class="project-img w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               loading="lazy"
             />
           </div>
@@ -85,9 +91,17 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+const { splitTextReveal, parallaxImage, lineDraw, magneticElement } = useAnimations()
+
 const { featuredProjects } = useProjects()
 const featured = computed(() => featuredProjects.value)
 const gridRef = ref<HTMLElement>()
+const sectionNumRef = ref<HTMLElement>()
+const sectionTitleRef = ref<HTMLElement>()
+const viewAllRef = ref<HTMLElement>()
+const dividerRef = ref<HTMLElement>()
+
+const cleanups: (() => void)[] = []
 
 function getProjectImage(project: any) {
   return `/projects/cropped/${project.slug}/01.jpg`
@@ -97,28 +111,92 @@ onMounted(() => {
   gsap.registerPlugin(ScrollTrigger)
 
   nextTick(() => {
-    const cards = document.querySelectorAll('.project-card')
-    if (cards.length) {
-      gsap.fromTo(cards,
-        { y: 60, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: gridRef.value,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
-        }
-      )
+    // Section number fade in
+    if (sectionNumRef.value) {
+      gsap.to(sectionNumRef.value, {
+        opacity: 1,
+        duration: 0.6,
+        scrollTrigger: {
+          trigger: sectionNumRef.value,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+        },
+      })
     }
+
+    // Section title text reveal
+    if (sectionTitleRef.value) {
+      splitTextReveal(sectionTitleRef.value, {
+        type: 'chars',
+        duration: 0.6,
+        stagger: 0.02,
+        scrollTrigger: {
+          trigger: sectionTitleRef.value,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+        },
+      })
+    }
+
+    // Divider line draw
+    if (dividerRef.value) {
+      lineDraw(dividerRef.value, {
+        duration: 1.2,
+        scrollTrigger: {
+          trigger: dividerRef.value,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+        },
+      })
+    }
+
+    // View all link
+    if (viewAllRef.value) {
+      const viewAllEl = viewAllRef.value?.$el ?? viewAllRef.value
+      gsap.to(viewAllEl, {
+        opacity: 1,
+        duration: 0.6,
+        delay: 0.4,
+        scrollTrigger: {
+          trigger: sectionTitleRef.value,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+        },
+      })
+
+      const cleanup = magneticElement(viewAllEl, 0.2)
+      if (cleanup) cleanups.push(cleanup)
+    }
+
+    // Project cards — each card triggers individually
+    const cards = document.querySelectorAll('.project-card')
+    cards.forEach((card, i) => {
+      gsap.to(card, {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        opacity: 1,
+        duration: 1.2,
+        ease: 'power4.out',
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 95%',
+          toggleActions: 'play none none none',
+        },
+      })
+    })
+
+    // Parallax on project images
+    const projectImgs = document.querySelectorAll('.project-img')
+    projectImgs.forEach((img) => {
+      parallaxImage(img as HTMLElement, {
+        speed: 0.15,
+        trigger: img.closest('.project-card') as HTMLElement,
+      })
+    })
   })
 })
 
 onUnmounted(() => {
-  ScrollTrigger.getAll().forEach(t => t.kill())
+  cleanups.forEach((fn) => fn())
+  ScrollTrigger.getAll().forEach((t) => t.kill())
 })
 </script>

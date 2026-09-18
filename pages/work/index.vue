@@ -3,17 +3,17 @@
     <!-- Page Header -->
     <section class="container mx-auto px-6 lg:px-12 mb-16">
       <div ref="headerRef">
-        <span class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400 mb-3 block">Portfolio</span>
-        <h1 class="text-5xl md:text-7xl font-heading font-bold text-zinc-900 mb-4">
+        <span ref="labelRef" class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400 mb-3 block" style="opacity: 0">Portfolio</span>
+        <h1 ref="titleRef" class="text-5xl md:text-7xl font-heading font-bold text-zinc-900 mb-4">
           Work
         </h1>
-        <p class="text-lg text-zinc-500 max-w-xl">
+        <p ref="subtitleRef" class="text-lg text-zinc-500 max-w-xl" style="opacity: 0; transform: translateY(15px)">
           A selection of branding, packaging, and campaign projects crafted over 6+ years.
         </p>
       </div>
 
       <!-- Category Filter -->
-      <div class="flex items-center gap-2 mt-10" id="category-filter">
+      <div ref="filterRef" class="flex items-center gap-2 mt-10" id="category-filter" style="opacity: 0">
         <button
           v-for="filter in filters"
           :key="filter.value"
@@ -32,6 +32,11 @@
       </div>
     </section>
 
+    <!-- Divider -->
+    <div class="container mx-auto px-6 lg:px-12">
+      <div ref="dividerRef" class="h-[1px] bg-zinc-200 mb-12" />
+    </div>
+
     <!-- Projects Grid -->
     <section class="container mx-auto px-6 lg:px-12 pb-32">
       <div ref="gridRef" class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8" id="projects-grid">
@@ -45,13 +50,14 @@
           ]"
           :data-cursor="'View'"
           :id="`work-project-${project.slug}`"
+          style="clip-path: inset(6% 6% 6% 6%); opacity: 0"
         >
-          <!-- Image -->
-          <div class="absolute inset-0 overflow-hidden">
+          <!-- Image with parallax -->
+          <div class="absolute inset-[-12%] overflow-hidden">
             <img
               :src="getProjectImage(project)"
               :alt="project.title"
-              class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              class="project-img w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               loading="lazy"
             />
           </div>
@@ -92,6 +98,8 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+const { splitTextReveal, parallaxImage, lineDraw } = useAnimations()
+
 useHead({
   title: 'Work',
 })
@@ -100,6 +108,11 @@ const { allProjects, brandingProjects, campaignProjects } = useProjects()
 
 const activeFilter = ref('all')
 const headerRef = ref<HTMLElement>()
+const labelRef = ref<HTMLElement>()
+const titleRef = ref<HTMLElement>()
+const subtitleRef = ref<HTMLElement>()
+const filterRef = ref<HTMLElement>()
+const dividerRef = ref<HTMLElement>()
 const gridRef = ref<HTMLElement>()
 
 const filters = computed(() => [
@@ -121,9 +134,17 @@ function getProjectImage(project: any) {
 watch(activeFilter, () => {
   nextTick(() => {
     const items = document.querySelectorAll('.project-item')
-    gsap.fromTo(items,
-      { y: 30, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, stagger: 0.08, ease: 'power3.out' }
+    gsap.fromTo(
+      items,
+      { clipPath: 'inset(6% 6% 6% 6%)', opacity: 0, y: 30 },
+      {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.08,
+        ease: 'power3.out',
+      }
     )
   })
 })
@@ -132,37 +153,64 @@ onMounted(() => {
   gsap.registerPlugin(ScrollTrigger)
 
   nextTick(() => {
-    // Animate header
-    if (headerRef.value) {
-      gsap.fromTo(headerRef.value,
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
-      )
+    // Label
+    if (labelRef.value) {
+      gsap.to(labelRef.value, { opacity: 1, duration: 0.6, ease: 'power3.out' })
     }
 
-    // Animate grid items
+    // Title text split
+    if (titleRef.value) {
+      splitTextReveal(titleRef.value, {
+        type: 'chars',
+        duration: 0.6,
+        stagger: 0.04,
+      })
+    }
+
+    // Subtitle
+    if (subtitleRef.value) {
+      gsap.to(subtitleRef.value, { opacity: 1, y: 0, duration: 0.8, delay: 0.3, ease: 'power3.out' })
+    }
+
+    // Filter
+    if (filterRef.value) {
+      gsap.to(filterRef.value, { opacity: 1, duration: 0.6, delay: 0.5, ease: 'power3.out' })
+    }
+
+    // Divider
+    if (dividerRef.value) {
+      lineDraw(dividerRef.value, { duration: 1 })
+    }
+
+    // Grid items — staggered clip reveal
     const items = document.querySelectorAll('.project-item')
     if (items.length) {
-      gsap.fromTo(items,
-        { y: 50, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.08,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: gridRef.value,
-            start: 'top 90%',
-            toggleActions: 'play none none none',
-          },
-        }
-      )
+      gsap.to(items, {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        opacity: 1,
+        duration: 1,
+        stagger: 0.1,
+        ease: 'power4.out',
+        scrollTrigger: {
+          trigger: gridRef.value,
+          start: 'top 90%',
+          toggleActions: 'play none none none',
+        },
+      })
     }
+
+    // Parallax images
+    const projectImgs = document.querySelectorAll('.project-img')
+    projectImgs.forEach((img) => {
+      parallaxImage(img as HTMLElement, {
+        speed: 0.12,
+        trigger: img.closest('.project-item') as HTMLElement,
+      })
+    })
   })
 })
 
 onUnmounted(() => {
-  ScrollTrigger.getAll().forEach(t => t.kill())
+  ScrollTrigger.getAll().forEach((t) => t.kill())
 })
 </script>

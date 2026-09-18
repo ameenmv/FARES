@@ -7,18 +7,20 @@
       <!-- CTA Section -->
       <div class="pt-32 pb-20 border-b border-zinc-800">
         <div>
-          <p class="text-zinc-500 text-sm font-medium uppercase tracking-widest mb-6">
+          <p ref="subtitleRef" class="text-zinc-500 text-sm font-medium uppercase tracking-widest mb-6" style="opacity: 0">
             Have a project in mind?
           </p>
-          <h2 class="text-5xl md:text-7xl lg:text-8xl font-heading font-bold leading-none tracking-tight mb-10">
+          <h2 ref="headingRef" class="text-5xl md:text-7xl lg:text-8xl font-heading font-bold leading-none tracking-tight mb-10">
             Let's Work
             <br />
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-zinc-600">Together</span>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-zinc-600 animate-gradient">Together</span>
           </h2>
           <NuxtLink
+            ref="ctaBtnRef"
             to="/contact"
-            class="inline-flex items-center gap-3 text-lg font-medium text-white border border-zinc-700 rounded-full px-8 py-4 hover:bg-white hover:text-zinc-900 transition-all duration-500 group"
+            class="magnetic-btn inline-flex items-center gap-3 text-lg font-medium text-white border border-zinc-700 rounded-full px-8 py-4 hover:bg-white hover:text-zinc-900 transition-all duration-500 group"
             id="footer-cta"
+            style="opacity: 0; transform: translateY(15px)"
           >
             Get in Touch
             <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -29,7 +31,7 @@
       </div>
 
       <!-- Footer Info -->
-      <div class="py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div ref="footerInfoRef" class="py-12 grid grid-cols-1 md:grid-cols-3 gap-10" style="opacity: 0">
         <!-- Contact -->
         <div>
           <h4 class="text-sm font-medium uppercase tracking-widest text-zinc-500 mb-4">Contact</h4>
@@ -76,9 +78,104 @@
 </template>
 
 <script setup lang="ts">
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+const { splitTextReveal, magneticElement } = useAnimations()
+
 const footerLinks = [
   { label: 'Work', path: '/work' },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
 ]
+
+const subtitleRef = ref<HTMLElement>()
+const headingRef = ref<HTMLElement>()
+const ctaBtnRef = ref<HTMLElement>()
+const footerInfoRef = ref<HTMLElement>()
+
+const cleanups: (() => void)[] = []
+
+onMounted(() => {
+  gsap.registerPlugin(ScrollTrigger)
+
+  nextTick(() => {
+    const footerEl = document.getElementById('footer')
+
+    // Subtitle
+    if (subtitleRef.value) {
+      gsap.to(subtitleRef.value, {
+        opacity: 1,
+        duration: 0.6,
+        scrollTrigger: { trigger: footerEl, start: 'top 95%', toggleActions: 'play none none none' },
+      })
+    }
+
+    // Heading text reveal
+    if (headingRef.value) {
+      splitTextReveal(headingRef.value, {
+        type: 'words',
+        duration: 0.8,
+        stagger: 0.05,
+        from: { y: '100%', opacity: 0 },
+        to: { y: '0%', opacity: 1 },
+        scrollTrigger: { trigger: footerEl, start: 'top 95%', toggleActions: 'play none none none' },
+      })
+    }
+
+    // CTA button
+    if (ctaBtnRef.value) {
+      const ctaBtnEl = ctaBtnRef.value?.$el ?? ctaBtnRef.value
+      gsap.to(ctaBtnEl, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        scrollTrigger: { trigger: footerEl, start: 'top 95%', toggleActions: 'play none none none' },
+      })
+      const cleanup = magneticElement(ctaBtnEl, 0.3)
+      if (cleanup) cleanups.push(cleanup)
+    }
+
+    // Footer info
+    if (footerInfoRef.value) {
+      gsap.to(footerInfoRef.value, {
+        opacity: 1,
+        duration: 0.8,
+        scrollTrigger: { trigger: footerEl, start: 'top 95%', toggleActions: 'play none none none' },
+      })
+    }
+
+    // Safety fallback: if triggers never fire, show everything after 3s
+    setTimeout(() => {
+      [subtitleRef.value, footerInfoRef.value].forEach((el) => {
+        if (el && getComputedStyle(el).opacity === '0') {
+          gsap.to(el, { opacity: 1, duration: 0.4 })
+        }
+      })
+      if (ctaBtnRef.value) {
+        const btnEl = ctaBtnRef.value?.$el ?? ctaBtnRef.value
+        if (btnEl && getComputedStyle(btnEl).opacity === '0') {
+          gsap.to(btnEl, { opacity: 1, y: 0, duration: 0.4 })
+        }
+      }
+    }, 3000)
+  })
+})
+
+onUnmounted(() => {
+  cleanups.forEach((fn) => fn())
+  ScrollTrigger.getAll().forEach((t) => t.kill())
+})
 </script>
+
+<style scoped>
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradientShift 4s ease infinite;
+}
+</style>

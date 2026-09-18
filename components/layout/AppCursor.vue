@@ -8,19 +8,12 @@
     <!-- Outer ring -->
     <div
       ref="cursorOuterRef"
-      class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40 transition-all duration-300"
-      :class="[
-        hovering ? 'w-16 h-16 opacity-100' : 'w-8 h-8 opacity-60',
-        clicking ? 'scale-75' : 'scale-100'
-      ]"
+      class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40 w-8 h-8 opacity-60"
     />
     <!-- Inner dot -->
     <div
       ref="cursorInnerRef"
-      class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-white transition-all duration-200"
-      :class="[
-        hovering ? 'w-2 h-2' : 'w-1.5 h-1.5'
-      ]"
+      class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-white w-1.5 h-1.5"
     />
     <!-- Label -->
     <Transition name="cursor-label">
@@ -35,6 +28,8 @@
 </template>
 
 <script setup lang="ts">
+import { gsap } from 'gsap'
+
 const cursorRef = ref<HTMLElement>()
 const cursorOuterRef = ref<HTMLElement>()
 const cursorInnerRef = ref<HTMLElement>()
@@ -47,8 +42,6 @@ const isTouchDevice = ref(true)
 
 let mouseX = 0
 let mouseY = 0
-let currentX = 0
-let currentY = 0
 
 onMounted(() => {
   isTouchDevice.value = 'ontouchstart' in window || navigator.maxTouchPoints > 0
@@ -61,8 +54,27 @@ onMounted(() => {
     visible.value = true
   }
 
-  const onMouseDown = () => { clicking.value = true }
-  const onMouseUp = () => { clicking.value = false }
+  const onMouseDown = () => {
+    clicking.value = true
+    if (cursorOuterRef.value) {
+      gsap.to(cursorOuterRef.value, {
+        scale: 0.75,
+        duration: 0.15,
+        ease: 'power2.out',
+      })
+    }
+  }
+
+  const onMouseUp = () => {
+    clicking.value = false
+    if (cursorOuterRef.value) {
+      gsap.to(cursorOuterRef.value, {
+        scale: hovering.value ? 2 : 1,
+        duration: 0.4,
+        ease: 'elastic.out(1, 0.5)',
+      })
+    }
+  }
 
   const onMouseEnter = () => { visible.value = true }
   const onMouseLeave = () => { visible.value = false }
@@ -81,20 +93,18 @@ onMounted(() => {
   observer.observe(document.body, { childList: true, subtree: true })
   setupHoverListeners()
 
-  // Animation loop with lerp
-  const animate = () => {
-    const ease = 0.15
-    currentX += (mouseX - currentX) * ease
-    currentY += (mouseY - currentY) * ease
-
+  // GSAP-powered lerp for cursor (smoother than manual RAF)
+  gsap.ticker.add(() => {
     if (cursorRef.value) {
-      cursorRef.value.style.transform = `translate(${currentX}px, ${currentY}px)`
+      gsap.to(cursorRef.value, {
+        x: mouseX,
+        y: mouseY,
+        duration: 0.5,
+        ease: 'power3.out',
+        overwrite: 'auto',
+      })
     }
-
-    requestAnimationFrame(animate)
-  }
-
-  requestAnimationFrame(animate)
+  })
 
   onUnmounted(() => {
     document.removeEventListener('mousemove', onMouseMove)
@@ -110,14 +120,52 @@ function setupHoverListeners() {
   const interactiveElements = document.querySelectorAll('a, button, [data-cursor]')
 
   interactiveElements.forEach((el) => {
+    // Skip if already has listeners
+    if ((el as any).__cursorListenersSet) return
+    ;(el as any).__cursorListenersSet = true
+
     el.addEventListener('mouseenter', () => {
       hovering.value = true
       const cursorLabel = (el as HTMLElement).dataset.cursor
       if (cursorLabel) label.value = cursorLabel
+
+      // Elastic scale up
+      if (cursorOuterRef.value) {
+        gsap.to(cursorOuterRef.value, {
+          scale: 2,
+          opacity: 1,
+          duration: 0.4,
+          ease: 'elastic.out(1, 0.5)',
+        })
+      }
+      if (cursorInnerRef.value) {
+        gsap.to(cursorInnerRef.value, {
+          scale: 1.3,
+          duration: 0.3,
+          ease: 'power3.out',
+        })
+      }
     })
+
     el.addEventListener('mouseleave', () => {
       hovering.value = false
       label.value = ''
+
+      if (cursorOuterRef.value) {
+        gsap.to(cursorOuterRef.value, {
+          scale: 1,
+          opacity: 0.6,
+          duration: 0.5,
+          ease: 'elastic.out(1, 0.4)',
+        })
+      }
+      if (cursorInnerRef.value) {
+        gsap.to(cursorInnerRef.value, {
+          scale: 1,
+          duration: 0.3,
+          ease: 'power3.out',
+        })
+      }
     })
   })
 }
