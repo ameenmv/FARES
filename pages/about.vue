@@ -1,113 +1,113 @@
 <template>
   <div class="pt-28">
-    <!-- Header -->
-    <section class="container mx-auto px-6 lg:px-12 mb-20">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
-        <div ref="introRef" style="opacity: 0; transform: translateY(30px)">
-          <span class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400 mb-3 block">About</span>
-          <h1 ref="aboutTitleRef" class="text-5xl md:text-7xl font-heading font-bold text-zinc-900 leading-tight mb-8">
-            I'm Fares
-            <br />
-            Mohammed
+    <!-- Hero -->
+    <section class="container mx-auto px-6 lg:px-12 mb-24">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-20">
+        <!-- Left: Intro -->
+        <div class="lg:col-span-7" ref="introRef" style="opacity: 0; transform: translateY(30px)">
+          <div class="flex items-center gap-4 mb-8">
+            <div ref="lineRef" class="h-[1px] w-12 bg-zinc-300" />
+            <span class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400">About</span>
+          </div>
+
+          <h1
+            ref="titleRef"
+            class="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-zinc-900 leading-[1.1] mb-8"
+          >
+            I'm Fares Mohammed
           </h1>
-          <p ref="aboutDescRef" class="text-xl text-zinc-500 leading-relaxed max-w-lg" style="opacity: 0">
+
+          <p class="text-xl md:text-2xl text-zinc-500 leading-relaxed max-w-xl font-light">
             A visual storyteller and senior graphic designer with 6+ years of experience creating bold, eye-catching designs across Egypt and Saudi Arabia.
           </p>
         </div>
 
-        <!-- Photo/Visual -->
-        <div ref="photoRef" style="opacity: 0; transform: translateY(50px) scale(0.96)">
-          <div class="rounded-3xl overflow-hidden bg-zinc-100 aspect-[4/5] relative">
-            <div class="absolute inset-0 bg-gradient-to-br from-zinc-100 via-zinc-50 to-zinc-200 flex items-center justify-center">
-              <div class="text-center">
-                <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-zinc-900 flex items-center justify-center">
-                  <span class="text-white text-5xl font-heading font-bold">FM</span>
-                </div>
-                <p class="text-zinc-600 font-heading font-semibold text-lg">Fares Mohammed</p>
-                <p class="text-zinc-400 text-sm mt-1">Senior Graphic Designer</p>
-              </div>
-            </div>
+        <!-- Right: Photo -->
+        <div class="lg:col-span-5" ref="photoRef" style="opacity: 0; transform: translateY(40px)">
+          <div class="rounded-2xl overflow-hidden shadow-2xl shadow-zinc-900/10 transform rotate-[-1.5deg] hover:rotate-0 transition-transform duration-700 ease-out">
+            <img
+              src="/images/fares-photo.jpg"
+              alt="Fares Mohammed"
+              class="w-full h-auto object-cover"
+            />
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Bio Points -->
-    <section class="bg-white py-24">
-      <div class="container mx-auto px-6 lg:px-12">
-        <div ref="bioRef" class="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
+    <!-- Bio Points — editorial list -->
+    <section class="container mx-auto px-6 lg:px-12 py-24 border-t border-zinc-200">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+        <div class="lg:col-span-4">
+          <h2 ref="bioLabelRef" class="text-3xl md:text-4xl font-heading font-semibold text-zinc-900" style="opacity: 0; transform: translateY(20px)">
+            What drives me
+          </h2>
+        </div>
+        <div class="lg:col-span-8 space-y-0">
           <div
             v-for="(point, index) in bioPoints"
             :key="index"
-            class="bio-item"
-            style="opacity: 0; transform: translateY(30px)"
+            class="bio-item border-t border-zinc-200 py-8 flex items-start gap-6"
+            style="opacity: 0; transform: translateY(15px)"
           >
-            <div class="flex items-start gap-5">
-              <span class="flex-shrink-0 text-5xl font-heading font-bold text-zinc-100">
-                {{ String(index + 1).padStart(2, '0') }}
-              </span>
-              <div>
-                <h3 class="text-xl font-heading font-semibold text-zinc-900 mb-3">
-                  {{ point.title }}
-                </h3>
-                <p class="text-zinc-500 leading-relaxed">
-                  {{ point.description }}
-                </p>
-              </div>
+            <span class="text-xs font-medium text-zinc-400 mt-1.5 flex-shrink-0 tabular-nums">
+              {{ String(index + 1).padStart(2, '0') }}
+            </span>
+            <div>
+              <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-900 mb-2">{{ point.title }}</h3>
+              <p class="text-zinc-500 leading-relaxed">{{ point.description }}</p>
             </div>
           </div>
+          <div class="border-t border-zinc-200" />
         </div>
       </div>
     </section>
 
-    <!-- Services -->
-    <section class="py-24">
-      <div class="container mx-auto px-6 lg:px-12">
-        <div ref="servicesHeaderRef" class="mb-16">
-          <span class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400 mb-3 block">What I Do</span>
-          <h2 ref="servicesTitleRef" class="text-4xl md:text-5xl font-heading font-bold text-zinc-900">
-            Services
-          </h2>
-        </div>
+    <!-- Services — 3-column cards -->
+    <section class="container mx-auto px-6 lg:px-12 py-24 border-t border-zinc-200">
+      <div class="mb-14">
+        <h2 ref="servicesLabelRef" class="text-3xl md:text-4xl font-heading font-semibold text-zinc-900" style="opacity: 0; transform: translateY(20px)">
+          What I do
+        </h2>
+      </div>
 
-        <div ref="servicesGridRef" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div
-            v-for="(service, index) in services"
-            :key="index"
-            class="service-card p-8 rounded-2xl bg-white border border-zinc-100 hover:border-zinc-200 hover:shadow-lg transition-all duration-500 group"
-            style="opacity: 0; transform: translateY(30px)"
-          >
-            <div class="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <span class="text-white text-lg">{{ service.icon }}</span>
-            </div>
-            <h3 class="text-xl font-heading font-semibold text-zinc-900 mb-3">
-              {{ service.title }}
-            </h3>
-            <p class="text-zinc-500 text-sm leading-relaxed">
-              {{ service.description }}
-            </p>
-          </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+          v-for="(service, index) in services"
+          :key="index"
+          class="service-item group p-8 md:p-10 rounded-2xl border border-zinc-100 hover:bg-zinc-900 transition-all duration-500 cursor-default"
+          style="opacity: 0; transform: translateY(20px)"
+        >
+          <span class="block text-5xl font-heading font-bold text-zinc-100 group-hover:text-zinc-700 transition-colors duration-500 mb-8">
+            {{ String(index + 1).padStart(2, '0') }}
+          </span>
+          <h3 class="text-xl font-heading font-semibold text-zinc-900 group-hover:text-white transition-colors duration-500 mb-3">
+            {{ service.title }}
+          </h3>
+          <p class="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-400 transition-colors duration-500">
+            {{ service.description }}
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- Experience Stats -->
-    <section class="bg-zinc-900 py-24 overflow-hidden">
+    <!-- Stats — minimal horizontal strip -->
+    <section class="py-20 border-t border-zinc-200">
       <div class="container mx-auto px-6 lg:px-12">
-        <div ref="statsRef" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+        <div ref="statsRef" class="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16">
           <div
             v-for="(stat, index) in stats"
             :key="stat.label"
-            class="stat-item text-center"
-            style="opacity: 0; transform: translateY(20px)"
+            class="stat-item"
+            style="opacity: 0; transform: translateY(15px)"
           >
             <span
               :ref="(el) => { if (el) statRefs[index] = el as HTMLElement }"
-              class="block text-5xl md:text-6xl font-heading font-bold text-white mb-2"
+              class="block text-4xl md:text-5xl font-heading font-bold text-zinc-900 mb-2"
             >
               0
             </span>
-            <span class="text-xs uppercase tracking-widest text-zinc-500">
+            <span class="text-xs uppercase tracking-widest text-zinc-400">
               {{ stat.label }}
             </span>
           </div>
@@ -115,25 +115,25 @@
       </div>
     </section>
 
-    <!-- Industries -->
-    <section class="py-24">
-      <div class="container mx-auto px-6 lg:px-12">
-        <div ref="industriesRef" class="mb-16">
-          <span class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400 mb-3 block">Experience</span>
-          <h2 class="text-4xl md:text-5xl font-heading font-bold text-zinc-900">
+    <!-- Industries — pill tags -->
+    <section class="container mx-auto px-6 lg:px-12 py-24 border-t border-zinc-200">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+        <div class="lg:col-span-4">
+          <h2 ref="industriesLabelRef" class="text-3xl md:text-4xl font-heading font-semibold text-zinc-900" style="opacity: 0; transform: translateY(20px)">
             Industries
           </h2>
         </div>
-
-        <div class="flex flex-wrap gap-3">
-          <span
-            v-for="industry in industries"
-            :key="industry"
-            class="industry-tag px-6 py-3 rounded-full border border-zinc-200 text-sm font-medium text-zinc-600 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all duration-300 cursor-default"
-            style="opacity: 0; transform: translateY(15px)"
-          >
-            {{ industry }}
-          </span>
+        <div class="lg:col-span-8">
+          <div class="flex flex-wrap gap-3">
+            <span
+              v-for="industry in industries"
+              :key="industry"
+              class="industry-tag px-5 py-2.5 rounded-full border border-zinc-200 text-sm font-medium text-zinc-600 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all duration-300 cursor-default"
+              style="opacity: 0; transform: translateY(10px)"
+            >
+              {{ industry }}
+            </span>
+          </div>
         </div>
       </div>
     </section>
@@ -147,7 +147,7 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-const { splitTextReveal, counterAnimation, staggerReveal } = useAnimations()
+const { splitTextReveal, counterAnimation, lineDraw } = useAnimations()
 
 useHead({
   title: 'About',
@@ -174,17 +174,14 @@ const bioPoints = [
 
 const services = [
   {
-    icon: '◆',
     title: 'Brand Identity',
     description: 'Complete visual identity systems including logos, typography, color palettes, and brand guidelines that define how your brand looks and feels.',
   },
   {
-    icon: '▣',
     title: 'Packaging Design',
     description: 'Eye-catching packaging solutions that stand out on shelves and create memorable unboxing experiences for your customers.',
   },
   {
-    icon: '◎',
     title: 'Campaign Design',
     description: 'Visual campaigns for social media, print, and digital platforms that engage audiences and drive meaningful brand connections.',
   },
@@ -209,15 +206,13 @@ const industries = [
 ]
 
 const introRef = ref<HTMLElement>()
-const aboutTitleRef = ref<HTMLElement>()
-const aboutDescRef = ref<HTMLElement>()
+const titleRef = ref<HTMLElement>()
 const photoRef = ref<HTMLElement>()
-const bioRef = ref<HTMLElement>()
-const servicesHeaderRef = ref<HTMLElement>()
-const servicesTitleRef = ref<HTMLElement>()
-const servicesGridRef = ref<HTMLElement>()
+const lineRef = ref<HTMLElement>()
+const bioLabelRef = ref<HTMLElement>()
+const servicesLabelRef = ref<HTMLElement>()
+const industriesLabelRef = ref<HTMLElement>()
 const statsRef = ref<HTMLElement>()
-const industriesRef = ref<HTMLElement>()
 
 const statRefs = ref<HTMLElement[]>([])
 
@@ -225,106 +220,79 @@ onMounted(() => {
   gsap.registerPlugin(ScrollTrigger)
 
   nextTick(() => {
-    // Intro
+    // Hero intro
     if (introRef.value) {
       gsap.to(introRef.value, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' })
     }
-
-    // Title split
-    if (aboutTitleRef.value) {
-      splitTextReveal(aboutTitleRef.value, {
-        type: 'chars',
-        duration: 0.5,
-        stagger: 0.03,
-        delay: 0.2,
-      })
+    if (lineRef.value) {
+      lineDraw(lineRef.value, { duration: 0.8 })
     }
-
-    // Description
-    if (aboutDescRef.value) {
-      gsap.to(aboutDescRef.value, { opacity: 1, duration: 0.8, delay: 0.5, ease: 'power3.out' })
+    if (titleRef.value) {
+      splitTextReveal(titleRef.value, { type: 'chars', duration: 0.5, stagger: 0.03, delay: 0.2 })
     }
 
     // Photo
     if (photoRef.value) {
-      gsap.to(photoRef.value, { opacity: 1, y: 0, scale: 1, duration: 1.2, delay: 0.3, ease: 'power3.out' })
+      gsap.to(photoRef.value, { opacity: 1, y: 0, duration: 1, delay: 0.3, ease: 'power3.out' })
     }
+
+    // Section labels
+    ;[bioLabelRef, servicesLabelRef, industriesLabelRef].forEach((ref) => {
+      if (ref.value) {
+        gsap.to(ref.value, {
+          y: 0, opacity: 1, duration: 0.7, ease: 'power3.out',
+          scrollTrigger: { trigger: ref.value, start: 'top 90%', toggleActions: 'play none none none' },
+        })
+      }
+    })
 
     // Bio items
     const bioItems = document.querySelectorAll('.bio-item')
-    if (bioItems.length) {
-      gsap.to(bioItems, {
-        y: 0,
-        opacity: 1,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: bioRef.value, start: 'top 80%', toggleActions: 'play none none none' },
+    bioItems.forEach((item) => {
+      gsap.to(item, {
+        y: 0, opacity: 1, duration: 0.6, ease: 'power3.out',
+        scrollTrigger: { trigger: item, start: 'top 95%', toggleActions: 'play none none none' },
       })
-    }
+    })
 
-    // Services title
-    if (servicesTitleRef.value) {
-      splitTextReveal(servicesTitleRef.value, {
-        type: 'chars',
-        duration: 0.5,
-        stagger: 0.03,
-        scrollTrigger: { trigger: servicesHeaderRef.value, start: 'top 85%', toggleActions: 'play none none none' },
+    // Service items
+    const serviceItems = document.querySelectorAll('.service-item')
+    serviceItems.forEach((item) => {
+      gsap.to(item, {
+        y: 0, opacity: 1, duration: 0.6, ease: 'power3.out',
+        scrollTrigger: { trigger: item, start: 'top 95%', toggleActions: 'play none none none' },
       })
-    }
+    })
 
-    // Service cards
-    const serviceCards = document.querySelectorAll('.service-card')
-    if (serviceCards.length) {
-      gsap.to(serviceCards, {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: servicesGridRef.value, start: 'top 85%', toggleActions: 'play none none none' },
-      })
-    }
-
-    // Stats — counter animation
+    // Stats
     const statItems = document.querySelectorAll('.stat-item')
-    if (statItems.length) {
-      gsap.to(statItems, {
-        y: 0,
-        opacity: 1,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'power3.out',
+    statItems.forEach((item, i) => {
+      gsap.to(item, {
+        y: 0, opacity: 1, duration: 0.6, ease: 'power3.out',
         scrollTrigger: {
-          trigger: statsRef.value,
-          start: 'top 85%',
+          trigger: item,
+          start: 'top 95%',
           toggleActions: 'play none none none',
           onEnter: () => {
-            stats.forEach((stat, i) => {
-              if (statRefs.value[i]) {
-                counterAnimation(statRefs.value[i], stat.value, {
-                  duration: 2,
-                  suffix: stat.suffix,
-                })
-              }
-            })
+            if (statRefs.value[i]) {
+              counterAnimation(statRefs.value[i], stats[i].value, {
+                duration: 2,
+                suffix: stats[i].suffix,
+              })
+            }
           },
         },
       })
-    }
+    })
 
-    // Industries — elastic stagger
+    // Industries
     const industryTags = document.querySelectorAll('.industry-tag')
-    if (industryTags.length) {
-      gsap.to(industryTags, {
-        y: 0,
-        opacity: 1,
-        duration: 0.5,
-        stagger: 0.05,
-        ease: 'back.out(1.7)',
-        scrollTrigger: { trigger: industriesRef.value, start: 'top 85%', toggleActions: 'play none none none' },
+    industryTags.forEach((tag) => {
+      gsap.to(tag, {
+        y: 0, opacity: 1, duration: 0.4, ease: 'back.out(1.7)',
+        scrollTrigger: { trigger: tag, start: 'top 95%', toggleActions: 'play none none none' },
       })
-    }
+    })
   })
 })
 
