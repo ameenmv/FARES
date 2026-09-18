@@ -46,55 +46,44 @@
 
     <!-- Project Info -->
     <section class="container mx-auto px-6 lg:px-12 py-16 md:py-24">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-        <!-- Metadata -->
-        <div ref="metaRef" class="lg:col-span-4 space-y-8" style="opacity: 0; transform: translateY(30px)">
+      <!-- Title -->
+      <div ref="metaRef" style="opacity: 0; transform: translateY(30px)">
+        <h1 ref="projectTitleRef" class="text-5xl md:text-7xl lg:text-8xl font-heading font-bold text-zinc-900 leading-[0.9] tracking-[-0.03em] mb-12">
+          {{ project.title }}
+        </h1>
+      </div>
+
+      <!-- Metadata strip -->
+      <div ref="metaLineRef" class="border-t border-zinc-200 pt-8 mb-16">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8" style="opacity: 0; transform: translateY(15px)" ref="metaStripRef">
           <div>
-            <h1 ref="projectTitleRef" class="text-5xl md:text-6xl font-heading font-bold text-zinc-900 mb-4">
-              {{ project.title }}
-            </h1>
-            <div class="flex items-center gap-3">
-              <span class="text-xs uppercase tracking-widest text-zinc-400 px-3 py-1 rounded-full border border-zinc-200">
-                {{ project.category }}
-              </span>
-              <span class="text-xs uppercase tracking-widest text-zinc-400">
-                {{ project.industry }}
-              </span>
-            </div>
+            <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-2">Category</h4>
+            <p class="text-sm font-medium text-zinc-900">{{ project.category }}</p>
           </div>
-
-          <!-- Horizontal line -->
-          <div ref="metaLineRef" class="h-[1px] bg-zinc-200" />
-
-          <div class="space-y-4">
-            <div>
-              <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-1">Industry</h4>
-              <p class="text-sm font-medium text-zinc-700">{{ project.industry }}</p>
-            </div>
-            <div>
-              <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-1">Services</h4>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="service in project.services"
-                  :key="service"
-                  class="text-sm text-zinc-600 bg-zinc-100 px-3 py-1 rounded-full"
-                >
-                  {{ service }}
-                </span>
-              </div>
+          <div>
+            <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-2">Industry</h4>
+            <p class="text-sm font-medium text-zinc-900">{{ project.industry }}</p>
+          </div>
+          <div class="col-span-2">
+            <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-2">Services</h4>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="service in project.services"
+                :key="service"
+                class="text-sm text-zinc-600"
+              >
+                {{ service }}<span class="text-zinc-300 ml-2 last:hidden">/</span>
+              </span>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Description -->
-        <div ref="descRef" class="lg:col-span-8" style="opacity: 0; transform: translateY(40px)">
-          <div class="max-w-2xl">
-            <h3 class="text-xs uppercase tracking-widest text-zinc-400 mb-4">Description</h3>
-            <p class="text-xl md:text-2xl text-zinc-700 leading-relaxed font-light">
-              {{ project.description }}
-            </p>
-          </div>
-        </div>
+      <!-- Description -->
+      <div ref="descRef" class="max-w-3xl" style="opacity: 0; transform: translateY(20px)">
+        <p class="text-xl md:text-2xl text-zinc-500 leading-relaxed font-light">
+          {{ project.description }}
+        </p>
       </div>
     </section>
 
@@ -188,6 +177,7 @@ const previousProject = computed(() => getPreviousProject(slug.value))
 const heroImageRef = ref<HTMLElement>()
 const heroImgEl = ref<HTMLElement>()
 const metaRef = ref<HTMLElement>()
+const metaStripRef = ref<HTMLElement>()
 const descRef = ref<HTMLElement>()
 const projectTitleRef = ref<HTMLElement>()
 const metaLineRef = ref<HTMLElement>()
@@ -293,11 +283,13 @@ function animateIn() {
       }, '<')
     }
 
-    // Meta line draw
-    if (metaLineRef.value) {
-      tl.add(() => {
-        lineDraw(metaLineRef.value!)
-      }, '-=0.4')
+    // Metadata strip
+    if (metaStripRef.value) {
+      tl.to(metaStripRef.value, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+      }, '-=0.3')
     }
 
     // Description
@@ -306,7 +298,7 @@ function animateIn() {
         opacity: 1,
         y: 0,
         duration: 0.8,
-      }, '-=0.5')
+      }, '-=0.4')
     }
 
     // Gallery items — alternating reveal directions
