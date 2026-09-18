@@ -35,6 +35,9 @@ export function useAnimations() {
 
     // Preserve original HTML
     const text = el.textContent || ''
+    
+    // Make element visible (it may be hidden to prevent flash)
+    el.style.visibility = 'visible'
 
     if (type === 'chars') {
       // Split into characters, preserving spaces

@@ -24,7 +24,7 @@
         <h1
           ref="nameRef"
           class="text-zinc-900 leading-[0.85] tracking-[-0.04em] whitespace-nowrap"
-          style="font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 8.2vw, 11rem);"
+          style="font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 8.2vw, 11rem); visibility: hidden;"
         >
           Fares Mohammed
         </h1>
