@@ -3,46 +3,77 @@
     <div
       v-if="loading"
       ref="preloaderRef"
-      class="fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950"
+      class="fixed inset-0 z-[9999] bg-white overflow-hidden"
       id="preloader"
     >
-      <!-- Background grain texture -->
-      <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E')" />
-
-      <div class="relative text-center">
-        <!-- Monogram -->
-        <div ref="monogramRef" class="mb-8">
-          <span class="text-6xl md:text-7xl font-heading font-black text-white tracking-tighter">
-            FM
-          </span>
-        </div>
-
-        <!-- Counter -->
-        <div ref="counterRef" class="overflow-hidden">
+      <!-- Content wrapper -->
+      <div class="relative w-full h-full flex flex-col justify-between px-6 lg:px-12 py-8">
+        <!-- Top row -->
+        <div class="flex items-center justify-between">
           <span
-            ref="counterNumberRef"
-            class="block text-sm font-mono text-zinc-500 tracking-widest tabular-nums"
+            ref="topLabelRef"
+            class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400"
+            style="opacity: 0"
           >
-            0%
+            Portfolio
+          </span>
+          <span
+            ref="yearRef"
+            class="text-xs font-mono text-zinc-400 tabular-nums"
+            style="opacity: 0"
+          >
+            2024
           </span>
         </div>
 
-        <!-- Progress bar -->
-        <div class="mt-6 w-48 h-[1px] bg-zinc-800 mx-auto overflow-hidden">
-          <div
-            ref="progressRef"
-            class="h-full bg-white origin-left"
-            style="transform: scaleX(0)"
-          />
+        <!-- Center: Name reveal -->
+        <div class="flex-1 flex items-center justify-center">
+          <div class="text-center overflow-hidden">
+            <h1
+              ref="nameRef"
+              class="text-zinc-900 leading-[0.85] tracking-[-0.04em]"
+              style="font-family: var(--font-display); font-weight: 800; font-size: clamp(2.5rem, 8vw, 10rem); transform: translateY(100%)"
+            >
+              Fares Mohammed
+            </h1>
+          </div>
+        </div>
+
+        <!-- Bottom: Progress bar + counter -->
+        <div class="flex items-end justify-between gap-6">
+          <span
+            ref="roleRef"
+            class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400"
+            style="opacity: 0"
+          >
+            Senior Graphic Designer
+          </span>
+
+          <div class="flex items-center gap-4">
+            <!-- Counter -->
+            <span
+              ref="counterRef"
+              class="text-xs font-mono text-zinc-400 tabular-nums"
+              style="opacity: 0"
+            >
+              0
+            </span>
+
+            <!-- Progress line -->
+            <div class="w-32 md:w-48 h-[1px] bg-zinc-200 overflow-hidden">
+              <div
+                ref="progressRef"
+                class="h-full bg-zinc-900 origin-left"
+                style="transform: scaleX(0)"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Curtain overlay -->
-      <div
-        ref="curtainRef"
-        class="absolute inset-0 bg-zinc-950 origin-bottom"
-        style="transform: scaleY(0)"
-      />
+      <!-- Curtain panels (split reveal) -->
+      <div ref="curtainTopRef" class="absolute top-0 left-0 right-0 h-1/2 bg-white z-10" style="transform-origin: top; transform: scaleY(0)" />
+      <div ref="curtainBottomRef" class="absolute bottom-0 left-0 right-0 h-1/2 bg-white z-10" style="transform-origin: bottom; transform: scaleY(0)" />
     </div>
   </Transition>
 </template>
@@ -52,11 +83,14 @@ import { gsap } from 'gsap'
 
 const loading = ref(true)
 const preloaderRef = ref<HTMLElement>()
-const monogramRef = ref<HTMLElement>()
+const nameRef = ref<HTMLElement>()
+const topLabelRef = ref<HTMLElement>()
+const yearRef = ref<HTMLElement>()
+const roleRef = ref<HTMLElement>()
 const counterRef = ref<HTMLElement>()
-const counterNumberRef = ref<HTMLElement>()
 const progressRef = ref<HTMLElement>()
-const curtainRef = ref<HTMLElement>()
+const curtainTopRef = ref<HTMLElement>()
+const curtainBottomRef = ref<HTMLElement>()
 
 const emit = defineEmits<{
   complete: []
@@ -64,11 +98,12 @@ const emit = defineEmits<{
 
 onMounted(() => {
   // Skip preloader if already visited this session
-  if (sessionStorage.getItem('preloader-shown')) {
-    loading.value = false
-    nextTick(() => emit('complete'))
-    return
-  }
+  // TODO: Uncomment after testing
+  // if (sessionStorage.getItem('preloader-shown')) {
+  //   loading.value = false
+  //   nextTick(() => emit('complete'))
+  //   return
+  // }
 
   sessionStorage.setItem('preloader-shown', 'true')
 
@@ -79,43 +114,59 @@ onMounted(() => {
     },
   })
 
-  // Phase 1: Monogram fades in
-  tl.fromTo(
-    monogramRef.value,
-    { opacity: 0, scale: 0.8 },
-    { opacity: 1, scale: 1, duration: 0.6, ease: 'power3.out' }
+  // Phase 1: Name slides up from below
+  tl.to(nameRef.value, {
+    y: 0,
+    duration: 0.8,
+    ease: 'power4.out',
+    delay: 0.3,
+  })
+
+  // Phase 2: Labels fade in simultaneously
+  tl.to(
+    [topLabelRef.value, yearRef.value, roleRef.value, counterRef.value],
+    { opacity: 1, duration: 0.4, stagger: 0.05, ease: 'power2.out' },
+    '-=0.3'
   )
 
-  // Phase 2: Counter counts up + progress bar fills
+  // Phase 3: Progress bar fills + counter counts
   const counter = { val: 0 }
   tl.to(
     counter,
     {
       val: 100,
-      duration: 1.8,
+      duration: 1.4,
       ease: 'power2.inOut',
       onUpdate: () => {
-        if (counterNumberRef.value) {
-          counterNumberRef.value.textContent = `${Math.floor(counter.val)}%`
+        if (counterRef.value) {
+          counterRef.value.textContent = String(Math.floor(counter.val))
         }
       },
     },
-    '-=0.3'
+    '-=0.1'
   )
   tl.to(
     progressRef.value,
-    {
-      scaleX: 1,
-      duration: 1.8,
-      ease: 'power2.inOut',
-    },
+    { scaleX: 1, duration: 1.4, ease: 'power2.inOut' },
     '<'
   )
 
-  // Phase 3: Curtain reveal — slide up
+  // Phase 4: Split curtain reveal — panels cover from top/bottom then whole thing slides away
+  tl.to(
+    curtainTopRef.value,
+    { scaleY: 1, duration: 0.5, ease: 'power4.inOut' },
+    '-=0.1'
+  )
+  tl.to(
+    curtainBottomRef.value,
+    { scaleY: 1, duration: 0.5, ease: 'power4.inOut' },
+    '<'
+  )
+
+  // Phase 5: Whole preloader slides up
   tl.to(preloaderRef.value, {
     yPercent: -100,
-    duration: 0.8,
+    duration: 0.7,
     ease: 'power4.inOut',
   })
 })
