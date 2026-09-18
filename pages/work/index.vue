@@ -20,30 +20,26 @@
       </p>
 
       <!-- Category Filter -->
-      <div ref="filterRef" class="flex items-center gap-3 mt-12" id="category-filter" style="opacity: 0">
+      <div ref="filterRef" class="flex items-center gap-3 mt-12 border-t border-zinc-200 pt-8" id="category-filter" style="opacity: 0">
         <button
           v-for="filter in filters"
           :key="filter.value"
           @click="activeFilter = filter.value"
-          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-all duration-300"
+          class="relative text-sm font-medium transition-all duration-300"
           :class="[
             activeFilter === filter.value
-              ? 'bg-zinc-900 text-white border-zinc-900'
-              : 'bg-transparent text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-700'
+              ? 'text-zinc-900'
+              : 'text-zinc-400 hover:text-zinc-600'
           ]"
           :id="`filter-${filter.value}`"
         >
           {{ filter.label }}
-          <span
-            class="text-[10px] font-semibold min-w-[20px] h-5 flex items-center justify-center rounded-full"
-            :class="[
-              activeFilter === filter.value
-                ? 'bg-white/20 text-white'
-                : 'bg-zinc-100 text-zinc-400'
-            ]"
-          >
-            {{ filter.count }}
-          </span>
+          <span class="ml-1 text-xs opacity-50">{{ filter.count }}</span>
+          <!-- Active indicator -->
+          <div
+            v-if="activeFilter === filter.value"
+            class="absolute -bottom-2 left-0 right-0 h-[1px] bg-zinc-900"
+          />
         </button>
       </div>
     </section>
