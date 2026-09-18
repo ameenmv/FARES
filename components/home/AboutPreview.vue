@@ -27,7 +27,7 @@
               class="detail-item border-t border-zinc-200 py-6 flex items-start gap-6"
               style="opacity: 0; transform: translateY(15px)"
             >
-              <span class="text-xs font-medium text-zinc-300 mt-1.5 flex-shrink-0 tabular-nums">
+              <span class="text-xs font-medium text-zinc-500 mt-1.5 flex-shrink-0 tabular-nums">
                 {{ String(index + 1).padStart(2, '0') }}
               </span>
               <div>
@@ -75,7 +75,7 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-const { lineDraw, magneticElement } = useAnimations()
+const { magneticElement } = useAnimations()
 
 const details = [
   {
@@ -94,7 +94,6 @@ const details = [
 
 const leftRef = ref<HTMLElement>()
 const labelRef = ref<HTMLElement>()
-const lineTopRef = ref<HTMLElement>()
 const statementRef = ref<HTMLElement>()
 const photoRef = ref<HTMLElement>()
 const linkRef = ref<HTMLElement>()
@@ -107,18 +106,11 @@ onMounted(() => {
   nextTick(() => {
     const sectionEl = document.getElementById('about-preview')
 
-    // Label + line
-    if (lineTopRef.value) {
-      lineDraw(lineTopRef.value, {
-        duration: 0.8,
-        scrollTrigger: { trigger: sectionEl, start: 'top 85%', toggleActions: 'play none none none' },
-      })
-    }
+    // Label
     if (labelRef.value) {
       gsap.to(labelRef.value, {
         opacity: 1,
         duration: 0.6,
-        delay: 0.3,
         scrollTrigger: { trigger: sectionEl, start: 'top 85%', toggleActions: 'play none none none' },
       })
     }
