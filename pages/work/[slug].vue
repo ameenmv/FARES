@@ -81,7 +81,7 @@
 
     <!-- Project Images Gallery -->
     <section class="container mx-auto px-6 lg:px-12 pb-16">
-      <div class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <div
           v-for="(image, index) in detailImages"
           :key="index"
@@ -90,7 +90,7 @@
           <img
             :src="image"
             :alt="`${project.title} - Detail ${index + 1}`"
-            class="w-full h-auto object-cover"
+            class="w-full h-full object-cover"
             loading="lazy"
           />
         </div>
