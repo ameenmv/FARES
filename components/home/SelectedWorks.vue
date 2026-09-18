@@ -90,8 +90,7 @@ const featured = computed(() => featuredProjects.value)
 const gridRef = ref<HTMLElement>()
 
 function getProjectImage(project: any) {
-  const pageNum = String(project.pages[0]).padStart(3, '0')
-  return `/projects/full-pages/page-${pageNum}.jpg`
+  return `/projects/cropped/${project.slug}/01.jpg`
 }
 
 onMounted(() => {

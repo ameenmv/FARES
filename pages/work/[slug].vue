@@ -160,16 +160,15 @@ const descRef = ref<HTMLElement>()
 
 const heroImage = computed(() => {
   if (!project.value) return ''
-  const pageNum = String(project.value.pages[0]).padStart(3, '0')
-  return `/projects/full-pages/page-${pageNum}.jpg`
+  return `/projects/cropped/${project.value.slug}/01.jpg`
 })
 
 const detailImages = computed(() => {
   if (!project.value) return []
   const images: string[] = []
-  for (let i = project.value.pages[0] + 1; i <= project.value.pages[1]; i++) {
-    const pageNum = String(i).padStart(3, '0')
-    images.push(`/projects/full-pages/page-${pageNum}.jpg`)
+  for (let i = 2; i <= project.value.imageCount; i++) {
+    const imgNum = String(i).padStart(2, '0')
+    images.push(`/projects/cropped/${project.value.slug}/${imgNum}.jpg`)
   }
   return images
 })
