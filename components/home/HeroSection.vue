@@ -58,60 +58,71 @@ const lineRef = ref<HTMLElement>()
 const scrollIndicatorRef = ref<HTMLElement>()
 const scrollDotRef = ref<HTMLElement>()
 
-onMounted(() => {
+const preloaderDone = inject<Ref<boolean>>('preloaderDone', ref(true))
+
+function startAnimations() {
   gsap.registerPlugin(ScrollTrigger)
 
-  nextTick(() => {
-    const masterTl = gsap.timeline({
-      defaults: { ease: 'power4.out' },
-      delay: 0.3,
-    })
-
-    // 1. Name — character reveal
-    if (nameRef.value) {
-      splitTextReveal(nameRef.value, {
-        type: 'chars',
-        duration: 0.7,
-        stagger: 0.03,
-      })
-    }
-
-    // 2. (Portfolio) label slides up
-    masterTl.to(labelRef.value, {
-      y: 0,
-      opacity: 1,
-      duration: 0.6,
-    }, '+=0.2')
-
-    // 3. Line draw
-    if (lineRef.value) {
-      masterTl.add(() => {
-        lineDraw(lineRef.value!, { duration: 1 })
-      }, '-=0.3')
-    }
-
-    // 4. Scroll indicator
-    masterTl.to(scrollIndicatorRef.value, {
-      opacity: 1,
-      duration: 0.6,
-    }, '-=0.4')
-
-    // Scroll dot bounce
-    if (scrollDotRef.value) {
-      gsap.to(scrollDotRef.value, {
-        y: 8,
-        duration: 1,
-        repeat: -1,
-        yoyo: true,
-        ease: 'power2.inOut',
-      })
-    }
-
-    // Hero fades on scroll
-    if (contentRef.value) {
-      scrollFadeOut(contentRef.value, { end: '+=40%', scale: 0.98 })
-    }
+  const masterTl = gsap.timeline({
+    defaults: { ease: 'power4.out' },
   })
+
+  // 1. Name — character reveal
+  if (nameRef.value) {
+    splitTextReveal(nameRef.value, {
+      type: 'chars',
+      duration: 0.7,
+      stagger: 0.03,
+    })
+  }
+
+  // 2. (Portfolio) label slides up
+  masterTl.to(labelRef.value, {
+    y: 0,
+    opacity: 1,
+    duration: 0.6,
+  }, '+=0.1')
+
+  // 3. Line draw
+  if (lineRef.value) {
+    masterTl.add(() => {
+      lineDraw(lineRef.value!, { duration: 1 })
+    }, '-=0.3')
+  }
+
+  // 4. Scroll indicator
+  masterTl.to(scrollIndicatorRef.value, {
+    opacity: 1,
+    duration: 0.6,
+  }, '-=0.4')
+
+  // Scroll dot bounce
+  if (scrollDotRef.value) {
+    gsap.to(scrollDotRef.value, {
+      y: 8,
+      duration: 1,
+      repeat: -1,
+      yoyo: true,
+      ease: 'power2.inOut',
+    })
+  }
+
+  // Hero fades on scroll
+  if (contentRef.value) {
+    scrollFadeOut(contentRef.value, { end: '+=40%', scale: 0.98 })
+  }
+}
+
+onMounted(() => {
+  gsap.registerPlugin(ScrollTrigger)
+  
+  if (preloaderDone.value) {
+    startAnimations()
+  } else {
+    watch(preloaderDone, (done) => {
+      if (done) startAnimations()
+    })
+  }
 })
 
 onUnmounted(() => {

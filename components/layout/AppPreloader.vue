@@ -69,11 +69,7 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Curtain panels (split reveal) -->
-      <div ref="curtainTopRef" class="absolute top-0 left-0 right-0 h-1/2 bg-white z-10" style="transform-origin: top; transform: scaleY(0)" />
-      <div ref="curtainBottomRef" class="absolute bottom-0 left-0 right-0 h-1/2 bg-white z-10" style="transform-origin: bottom; transform: scaleY(0)" />
+    </div>
     </div>
   </Transition>
 </template>
@@ -89,8 +85,6 @@ const yearRef = ref<HTMLElement>()
 const roleRef = ref<HTMLElement>()
 const counterRef = ref<HTMLElement>()
 const progressRef = ref<HTMLElement>()
-const curtainTopRef = ref<HTMLElement>()
-const curtainBottomRef = ref<HTMLElement>()
 
 const emit = defineEmits<{
   complete: []
@@ -151,22 +145,16 @@ onMounted(() => {
     '<'
   )
 
-  // Phase 4: Split curtain reveal — panels cover from top/bottom then whole thing slides away
+  // Phase 4: Fade out all content
   tl.to(
-    curtainTopRef.value,
-    { scaleY: 1, duration: 0.5, ease: 'power4.inOut' },
-    '-=0.1'
-  )
-  tl.to(
-    curtainBottomRef.value,
-    { scaleY: 1, duration: 0.5, ease: 'power4.inOut' },
-    '<'
+    [nameRef.value, topLabelRef.value, yearRef.value, roleRef.value, counterRef.value, progressRef.value?.parentElement],
+    { opacity: 0, duration: 0.3, ease: 'power2.in' },
   )
 
-  // Phase 5: Whole preloader slides up
+  // Phase 5: Whole preloader slides up cleanly
   tl.to(preloaderRef.value, {
     yPercent: -100,
-    duration: 0.7,
+    duration: 0.8,
     ease: 'power4.inOut',
   })
 })
