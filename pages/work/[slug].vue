@@ -32,7 +32,7 @@
           @click="openLightbox(0)"
           data-cursor="View"
         >
-          <div class="absolute inset-[-15%] w-[130%] h-[130%]">
+          <div class="relative w-full h-full overflow-hidden">
             <img
               ref="heroImgEl"
               :src="heroImage"
