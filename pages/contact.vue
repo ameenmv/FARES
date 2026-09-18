@@ -1,116 +1,161 @@
 <template>
   <div class="pt-28 pb-32">
     <div class="container mx-auto px-6 lg:px-12">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
-        <!-- Left: Info -->
-        <div ref="infoRef" style="opacity: 0; transform: translateY(30px)">
-          <div>
-            <span class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400 mb-3 block">Contact</span>
-            <h1 ref="contactTitleRef" class="text-5xl md:text-7xl font-heading font-bold text-zinc-900 leading-tight mb-8">
-              Let's create
-              <br />
-              something
-              <br />
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-zinc-600 to-zinc-400">amazing.</span>
-            </h1>
-            <p ref="contactDescRef" class="text-lg text-zinc-500 max-w-md leading-relaxed" style="opacity: 0">
-              Have a project in mind? I'd love to hear about it. Let's discuss how we can work together to bring your ideas to life.
-            </p>
+      <!-- Label -->
+      <div ref="headerRef" class="mb-6" style="opacity: 0">
+        <div class="flex items-center gap-4">
+          <div ref="lineRef" class="h-[1px] w-12 bg-zinc-300" />
+          <span class="text-xs font-medium uppercase tracking-[0.3em] text-zinc-400">Contact</span>
+        </div>
+      </div>
+
+      <!-- Massive statement -->
+      <div class="mb-20">
+        <h1
+          ref="titleRef"
+          class="font-heading font-bold text-zinc-900 leading-[0.9] tracking-[-0.03em] mb-8"
+          style="font-size: clamp(2.5rem, 5.5vw, 6rem); visibility: hidden; white-space: nowrap"
+        >
+          Let's start a project together
+        </h1>
+      </div>
+
+      <!-- Two column layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-20">
+        <!-- Left: Form -->
+        <div class="lg:col-span-7 order-2 lg:order-1">
+          <div ref="formRef" style="opacity: 0; transform: translateY(30px)">
+            <form @submit.prevent id="contact-form">
+              <!-- Number labels for each field -->
+              <div class="space-y-0">
+                <div class="form-field border-t border-zinc-200 py-8">
+                  <div class="flex items-start gap-6">
+                    <span class="text-xs font-medium text-zinc-500 mt-3 tabular-nums flex-shrink-0">01</span>
+                    <div class="flex-1">
+                      <label for="name" class="block text-sm font-medium text-zinc-900 mb-4">What's your name?</label>
+                      <input
+                        id="name"
+                        type="text"
+                        placeholder="John Doe *"
+                        class="w-full bg-transparent text-zinc-600 placeholder-zinc-400 focus:outline-none text-lg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-field border-t border-zinc-200 py-8">
+                  <div class="flex items-start gap-6">
+                    <span class="text-xs font-medium text-zinc-500 mt-3 tabular-nums flex-shrink-0">02</span>
+                    <div class="flex-1">
+                      <label for="email" class="block text-sm font-medium text-zinc-900 mb-4">What's your email?</label>
+                      <input
+                        id="email"
+                        type="email"
+                        placeholder="john@doe.com *"
+                        class="w-full bg-transparent text-zinc-600 placeholder-zinc-400 focus:outline-none text-lg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-field border-t border-zinc-200 py-8">
+                  <div class="flex items-start gap-6">
+                    <span class="text-xs font-medium text-zinc-500 mt-3 tabular-nums flex-shrink-0">03</span>
+                    <div class="flex-1">
+                      <label for="service" class="block text-sm font-medium text-zinc-900 mb-4">What services are you looking for?</label>
+                      <input
+                        id="service"
+                        type="text"
+                        placeholder="Branding, Packaging, Campaign Design..."
+                        class="w-full bg-transparent text-zinc-600 placeholder-zinc-400 focus:outline-none text-lg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-field border-t border-zinc-200 py-8">
+                  <div class="flex items-start gap-6">
+                    <span class="text-xs font-medium text-zinc-500 mt-3 tabular-nums flex-shrink-0">04</span>
+                    <div class="flex-1">
+                      <label for="message" class="block text-sm font-medium text-zinc-900 mb-4">Your message</label>
+                      <textarea
+                        id="message"
+                        rows="3"
+                        placeholder="Hello Fares, I'd like to discuss a project..."
+                        class="w-full bg-transparent text-zinc-600 placeholder-zinc-400 focus:outline-none text-lg resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border-t border-zinc-200 pt-10">
+                  <button
+                    ref="submitBtnRef"
+                    type="submit"
+                    class="magnetic-btn group inline-flex items-center gap-4"
+                    id="contact-submit"
+                  >
+                    <span class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-900 group-hover:scale-110 transition-transform duration-500">
+                      <svg class="w-6 h-6 text-white transform group-hover:rotate-45 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10" />
+                      </svg>
+                    </span>
+                    <span class="text-lg font-medium text-zinc-900">Send it</span>
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
+        </div>
 
-          <!-- Contact Info -->
-          <div ref="contactInfoRef" class="mt-16 space-y-8" style="opacity: 0">
+        <!-- Right: Contact details -->
+        <div class="lg:col-span-5 order-1 lg:order-2">
+          <div ref="detailsRef" class="lg:sticky lg:top-32 space-y-12" style="opacity: 0; transform: translateY(20px)">
+            <!-- Email highlight -->
             <div>
-              <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-3">Social</h4>
+              <h4 class="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-4">Contact Details</h4>
               <a
-                href="https://instagram.com/faresmohammedd"
-                target="_blank"
-                rel="noopener"
-                class="text-xl font-medium text-zinc-900 hover:text-zinc-500 transition-colors duration-300 link-underline"
+                href="mailto:faresmohammed@email.com"
+                class="text-xl md:text-2xl font-heading font-semibold text-zinc-900 hover:text-zinc-500 transition-colors duration-300 block mb-2"
               >
-                @faresmohammedd
+                faresmohammed@email.com
               </a>
-            </div>
-
-            <div>
-              <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-3">Phone</h4>
               <a
                 href="tel:+201016072716"
-                class="text-xl font-medium text-zinc-900 hover:text-zinc-500 transition-colors duration-300 link-underline"
+                class="text-xl md:text-2xl font-heading font-semibold text-zinc-900 hover:text-zinc-500 transition-colors duration-300 block"
               >
                 +20 1016072716
               </a>
             </div>
 
+            <!-- Socials -->
             <div>
-              <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-3">Location</h4>
-              <p class="text-xl font-medium text-zinc-900">
-                Egypt & Saudi Arabia
-              </p>
+              <h4 class="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-4">Socials</h4>
+              <div class="space-y-2">
+                <a
+                  href="https://instagram.com/faresmohammedd"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-zinc-600 hover:text-zinc-900 transition-colors duration-300 block text-sm font-medium"
+                >
+                  Instagram ↗
+                </a>
+                <a
+                  href="https://behance.net/faresmohammed"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-zinc-600 hover:text-zinc-900 transition-colors duration-300 block text-sm font-medium"
+                >
+                  Behance ↗
+                </a>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Right: Contact Form -->
-        <div ref="formRef" style="opacity: 0; transform: translateY(40px)">
-          <div class="bg-white rounded-3xl border border-zinc-100 p-8 md:p-12 shadow-sm">
-            <h3 class="text-2xl font-heading font-semibold text-zinc-900 mb-8">
-              Send a message
-            </h3>
-
-            <form @submit.prevent class="space-y-6" id="contact-form">
-              <div class="form-field">
-                <label for="name" class="block text-xs uppercase tracking-widest text-zinc-400 mb-2">Name</label>
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="Your name"
-                  class="w-full px-0 py-3 bg-transparent border-0 border-b border-zinc-200 text-zinc-900 placeholder-zinc-300 focus:outline-none focus:border-zinc-900 transition-colors duration-300 text-lg"
-                />
-              </div>
-
-              <div class="form-field">
-                <label for="email" class="block text-xs uppercase tracking-widest text-zinc-400 mb-2">Email</label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  class="w-full px-0 py-3 bg-transparent border-0 border-b border-zinc-200 text-zinc-900 placeholder-zinc-300 focus:outline-none focus:border-zinc-900 transition-colors duration-300 text-lg"
-                />
-              </div>
-
-              <div class="form-field">
-                <label for="subject" class="block text-xs uppercase tracking-widest text-zinc-400 mb-2">Subject</label>
-                <input
-                  id="subject"
-                  type="text"
-                  placeholder="Project inquiry"
-                  class="w-full px-0 py-3 bg-transparent border-0 border-b border-zinc-200 text-zinc-900 placeholder-zinc-300 focus:outline-none focus:border-zinc-900 transition-colors duration-300 text-lg"
-                />
-              </div>
-
-              <div class="form-field">
-                <label for="message" class="block text-xs uppercase tracking-widest text-zinc-400 mb-2">Message</label>
-                <textarea
-                  id="message"
-                  rows="4"
-                  placeholder="Tell me about your project..."
-                  class="w-full px-0 py-3 bg-transparent border-0 border-b border-zinc-200 text-zinc-900 placeholder-zinc-300 focus:outline-none focus:border-zinc-900 transition-colors duration-300 text-lg resize-none"
-                />
-              </div>
-
-              <button
-                ref="submitBtnRef"
-                type="submit"
-                class="magnetic-btn w-full bg-zinc-900 text-white py-4 rounded-full font-medium text-lg hover:bg-zinc-700 transition-colors duration-500 mt-4 group flex items-center justify-center gap-3"
-                id="contact-submit"
-              >
-                Send Message
-                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </button>
-            </form>
+            <!-- Location -->
+            <div>
+              <h4 class="text-xs font-medium uppercase tracking-widest text-zinc-400 mb-4">Location</h4>
+              <p class="text-sm font-medium text-zinc-900">Egypt & Saudi Arabia</p>
+            </div>
           </div>
         </div>
       </div>
@@ -121,51 +166,46 @@
 <script setup lang="ts">
 import { gsap } from 'gsap'
 
-const { splitTextReveal, magneticElement } = useAnimations()
+const { splitTextReveal, magneticElement, lineDraw } = useAnimations()
 
 useHead({
   title: 'Contact',
 })
 
-const infoRef = ref<HTMLElement>()
-const contactTitleRef = ref<HTMLElement>()
-const contactDescRef = ref<HTMLElement>()
-const contactInfoRef = ref<HTMLElement>()
+const headerRef = ref<HTMLElement>()
+const lineRef = ref<HTMLElement>()
+const titleRef = ref<HTMLElement>()
 const formRef = ref<HTMLElement>()
+const detailsRef = ref<HTMLElement>()
 const submitBtnRef = ref<HTMLElement>()
 
 const cleanups: (() => void)[] = []
 
 onMounted(() => {
   nextTick(() => {
-    // Info section
-    if (infoRef.value) {
-      gsap.to(infoRef.value, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' })
+    // Header
+    if (headerRef.value) {
+      gsap.to(headerRef.value, { opacity: 1, duration: 0.6, ease: 'power3.out' })
     }
 
-    // Title split
-    if (contactTitleRef.value) {
-      splitTextReveal(contactTitleRef.value, {
+    // Line
+    if (lineRef.value) {
+      lineDraw(lineRef.value, { duration: 0.8 })
+    }
+
+    // Title
+    if (titleRef.value) {
+      splitTextReveal(titleRef.value, {
         type: 'words',
         duration: 0.7,
-        stagger: 0.04,
+        stagger: 0.06,
         delay: 0.2,
       })
     }
 
-    // Description
-    if (contactDescRef.value) {
-      gsap.to(contactDescRef.value, { opacity: 1, duration: 0.8, delay: 0.5, ease: 'power3.out' })
-    }
-
-    // Contact info cascade
-    if (contactInfoRef.value) {
-      gsap.to(contactInfoRef.value, { opacity: 1, duration: 0.8, delay: 0.6, ease: 'power3.out' })
-    }
-
     // Form
     if (formRef.value) {
-      gsap.to(formRef.value, { y: 0, opacity: 1, duration: 0.8, delay: 0.3, ease: 'power3.out' })
+      gsap.to(formRef.value, { y: 0, opacity: 1, duration: 0.8, delay: 0.5, ease: 'power3.out' })
     }
 
     // Form fields stagger
@@ -173,14 +213,19 @@ onMounted(() => {
     if (formFields.length) {
       gsap.fromTo(
         formFields,
-        { y: 15, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, stagger: 0.08, delay: 0.6, ease: 'power3.out' }
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, delay: 0.6, ease: 'power3.out' }
       )
+    }
+
+    // Details
+    if (detailsRef.value) {
+      gsap.to(detailsRef.value, { y: 0, opacity: 1, duration: 0.8, delay: 0.4, ease: 'power3.out' })
     }
 
     // Submit button magnetic
     if (submitBtnRef.value) {
-      const cleanup = magneticElement(submitBtnRef.value, 0.15)
+      const cleanup = magneticElement(submitBtnRef.value, 0.2)
       if (cleanup) cleanups.push(cleanup)
     }
   })
