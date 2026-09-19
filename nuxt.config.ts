@@ -24,19 +24,19 @@ export default defineNuxtConfig({
         { property: 'og:type', content: 'website' },
         { property: 'og:title', content: 'Fares Mohammed — Senior Graphic Designer' },
         { property: 'og:description', content: 'Visual Storyteller & Senior Graphic Designer with 6+ years of experience in branding, packaging, and campaign design across Egypt and Saudi Arabia.' },
-        { property: 'og:url', content: 'https://faresmohammed.com' },
+        { property: 'og:url', content: 'https://faresmohammed.vercel.app' },
         { property: 'og:site_name', content: 'Fares Mohammed' },
-        { property: 'og:image', content: 'https://faresmohammed.com/og-image.jpg' },
+        { property: 'og:image', content: 'https://faresmohammed.vercel.app/og-image.jpg' },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'Fares Mohammed — Senior Graphic Designer' },
         { name: 'twitter:description', content: 'Visual Storyteller & Senior Graphic Designer — Branding, Packaging, and Campaign Design.' },
-        { name: 'twitter:image', content: 'https://faresmohammed.com/og-image.jpg' },
+        { name: 'twitter:image', content: 'https://faresmohammed.vercel.app/og-image.jpg' },
       ],
       link: [
-        { rel: 'canonical', href: 'https://faresmohammed.com' },
+        { rel: 'canonical', href: 'https://faresmohammed.vercel.app' },
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       ],
     },
@@ -67,7 +67,7 @@ export default defineNuxtConfig({
   },
 
   site: {
-    url: 'https://faresmohammed.com',
+    url: 'https://faresmohammed.vercel.app',
     name: 'Fares Mohammed',
     description: 'Visual Storyteller & Senior Graphic Designer — Branding, Packaging, and Campaign Design',
     defaultLocale: 'en',
@@ -107,6 +107,6 @@ export default defineNuxtConfig({
         disallow: ['/api/', '/_nuxt/'],
       },
     ],
-    sitemap: 'https://faresmohammed.com/sitemap.xml',
+    sitemap: 'https://faresmohammed.vercel.app/sitemap.xml',
   },
 })
