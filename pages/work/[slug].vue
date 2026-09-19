@@ -46,63 +46,48 @@
 
     <!-- Project Info -->
     <section class="container mx-auto px-6 lg:px-12 py-20 md:py-32">
-      <!-- Title row -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 md:mb-24">
-        <div class="lg:col-span-8" ref="metaRef" style="opacity: 0; transform: translateY(30px)">
-          <h1
-            ref="projectTitleRef"
-            class="text-6xl md:text-8xl lg:text-9xl font-heading font-bold text-zinc-900 leading-[0.85] tracking-[-0.04em]"
-            style="visibility: hidden"
-          >
-            {{ project.title }}
-          </h1>
+      <!-- Title + index -->
+      <div class="relative mb-16 md:mb-24" ref="metaRef" style="opacity: 0; transform: translateY(30px)">
+        <h1
+          ref="projectTitleRef"
+          class="text-6xl md:text-8xl lg:text-9xl font-heading font-bold text-zinc-900 leading-[0.85] tracking-[-0.04em]"
+          style="visibility: hidden"
+        >
+          {{ project.title }}
+        </h1>
+        <!-- Ghost index number -->
+        <span
+          ref="indexNumRef"
+          class="absolute top-0 right-0 text-[10rem] md:text-[14rem] font-heading font-bold text-zinc-50 leading-none -z-10 select-none"
+          style="opacity: 0"
+        >
+          {{ String(projectIndex + 1).padStart(2, '0') }}
+        </span>
+      </div>
+
+      <!-- Metadata strip — horizontal columns -->
+      <div ref="metaStripRef" class="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-6 mb-16 md:mb-20" style="opacity: 0; transform: translateY(20px)">
+        <div class="border-t-2 border-zinc-900 pt-5">
+          <span class="block text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">Category</span>
+          <p class="text-base font-medium text-zinc-900 capitalize">{{ project.category }}</p>
         </div>
-        <div class="lg:col-span-4 flex items-end justify-start lg:justify-end">
-          <span
-            ref="indexNumRef"
-            class="text-8xl md:text-9xl font-heading font-bold text-zinc-100 leading-none"
-            style="opacity: 0"
-          >
-            {{ String(projectIndex + 1).padStart(2, '0') }}
-          </span>
+        <div class="border-t-2 border-zinc-900 pt-5">
+          <span class="block text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">Industry</span>
+          <p class="text-base font-medium text-zinc-900">{{ project.industry }}</p>
+        </div>
+        <div class="border-t-2 border-zinc-900 pt-5 col-span-2 md:col-span-1">
+          <span class="block text-xs font-medium uppercase tracking-widest text-zinc-400 mb-2">Services</span>
+          <p class="text-base font-medium text-zinc-900">
+            {{ project.services.join(' · ') }}
+          </p>
         </div>
       </div>
 
-      <!-- Description + metadata -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
-        <!-- Description — takes most of the width -->
-        <div ref="descRef" class="lg:col-span-7" style="opacity: 0; transform: translateY(25px)">
-          <p class="text-2xl md:text-3xl text-zinc-500 leading-[1.5] font-light">
-            {{ project.description }}
-          </p>
-        </div>
-
-        <!-- Metadata — right column, bordered list -->
-        <div ref="metaStripRef" class="lg:col-span-5" style="opacity: 0; transform: translateY(20px)">
-          <div class="space-y-0">
-            <div class="border-t border-zinc-200 py-5 flex items-start gap-8">
-              <span class="text-xs font-medium uppercase tracking-widest text-zinc-400 mt-0.5 w-20 flex-shrink-0">Category</span>
-              <p class="text-sm font-medium text-zinc-900">{{ project.category }}</p>
-            </div>
-            <div class="border-t border-zinc-200 py-5 flex items-start gap-8">
-              <span class="text-xs font-medium uppercase tracking-widest text-zinc-400 mt-0.5 w-20 flex-shrink-0">Industry</span>
-              <p class="text-sm font-medium text-zinc-900">{{ project.industry }}</p>
-            </div>
-            <div class="border-t border-zinc-200 py-5 flex items-start gap-8">
-              <span class="text-xs font-medium uppercase tracking-widest text-zinc-400 mt-0.5 w-20 flex-shrink-0">Services</span>
-              <div class="flex flex-wrap gap-x-3 gap-y-1">
-                <span
-                  v-for="(service, i) in project.services"
-                  :key="service"
-                  class="text-sm font-medium text-zinc-900"
-                >
-                  {{ service }}<span v-if="i < project.services.length - 1" class="text-zinc-300 ml-1">,</span>
-                </span>
-              </div>
-            </div>
-            <div class="border-t border-zinc-200" />
-          </div>
-        </div>
+      <!-- Description — full width, elegant -->
+      <div ref="descRef" class="max-w-3xl" style="opacity: 0; transform: translateY(25px)">
+        <p class="text-xl md:text-2xl text-zinc-500 leading-[1.7] font-light">
+          {{ project.description }}
+        </p>
       </div>
     </section>
 
