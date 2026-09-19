@@ -298,6 +298,7 @@ export function useProjects() {
   }
 
   return {
+    projects: allProjects,
     allProjects,
     featuredProjects,
     brandingProjects,

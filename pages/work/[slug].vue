@@ -45,45 +45,64 @@
     </section>
 
     <!-- Project Info -->
-    <section class="container mx-auto px-6 lg:px-12 py-16 md:py-24">
-      <!-- Title -->
-      <div ref="metaRef" style="opacity: 0; transform: translateY(30px)">
-        <h1 ref="projectTitleRef" class="text-5xl md:text-7xl lg:text-8xl font-heading font-bold text-zinc-900 leading-[0.9] tracking-[-0.03em] mb-12">
-          {{ project.title }}
-        </h1>
-      </div>
-
-      <!-- Metadata strip -->
-      <div ref="metaLineRef" class="border-t border-zinc-200 pt-8 mb-16">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8" style="opacity: 0; transform: translateY(15px)" ref="metaStripRef">
-          <div>
-            <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-2">Category</h4>
-            <p class="text-sm font-medium text-zinc-900">{{ project.category }}</p>
-          </div>
-          <div>
-            <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-2">Industry</h4>
-            <p class="text-sm font-medium text-zinc-900">{{ project.industry }}</p>
-          </div>
-          <div class="col-span-2">
-            <h4 class="text-xs uppercase tracking-widest text-zinc-400 mb-2">Services</h4>
-            <div class="flex flex-wrap gap-2">
-              <span
-                v-for="service in project.services"
-                :key="service"
-                class="text-sm text-zinc-600"
-              >
-                {{ service }}<span class="text-zinc-300 ml-2 last:hidden">/</span>
-              </span>
-            </div>
-          </div>
+    <section class="container mx-auto px-6 lg:px-12 py-20 md:py-32">
+      <!-- Title row -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 md:mb-24">
+        <div class="lg:col-span-8" ref="metaRef" style="opacity: 0; transform: translateY(30px)">
+          <h1
+            ref="projectTitleRef"
+            class="text-6xl md:text-8xl lg:text-9xl font-heading font-bold text-zinc-900 leading-[0.85] tracking-[-0.04em]"
+            style="visibility: hidden"
+          >
+            {{ project.title }}
+          </h1>
+        </div>
+        <div class="lg:col-span-4 flex items-end justify-start lg:justify-end">
+          <span
+            ref="indexNumRef"
+            class="text-8xl md:text-9xl font-heading font-bold text-zinc-100 leading-none"
+            style="opacity: 0"
+          >
+            {{ String(projectIndex + 1).padStart(2, '0') }}
+          </span>
         </div>
       </div>
 
-      <!-- Description -->
-      <div ref="descRef" class="max-w-3xl" style="opacity: 0; transform: translateY(20px)">
-        <p class="text-xl md:text-2xl text-zinc-500 leading-relaxed font-light">
-          {{ project.description }}
-        </p>
+      <!-- Description + metadata -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+        <!-- Description — takes most of the width -->
+        <div ref="descRef" class="lg:col-span-7" style="opacity: 0; transform: translateY(25px)">
+          <p class="text-2xl md:text-3xl text-zinc-500 leading-[1.5] font-light">
+            {{ project.description }}
+          </p>
+        </div>
+
+        <!-- Metadata — right column, bordered list -->
+        <div ref="metaStripRef" class="lg:col-span-5" style="opacity: 0; transform: translateY(20px)">
+          <div class="space-y-0">
+            <div class="border-t border-zinc-200 py-5 flex items-start gap-8">
+              <span class="text-xs font-medium uppercase tracking-widest text-zinc-400 mt-0.5 w-20 flex-shrink-0">Category</span>
+              <p class="text-sm font-medium text-zinc-900">{{ project.category }}</p>
+            </div>
+            <div class="border-t border-zinc-200 py-5 flex items-start gap-8">
+              <span class="text-xs font-medium uppercase tracking-widest text-zinc-400 mt-0.5 w-20 flex-shrink-0">Industry</span>
+              <p class="text-sm font-medium text-zinc-900">{{ project.industry }}</p>
+            </div>
+            <div class="border-t border-zinc-200 py-5 flex items-start gap-8">
+              <span class="text-xs font-medium uppercase tracking-widest text-zinc-400 mt-0.5 w-20 flex-shrink-0">Services</span>
+              <div class="flex flex-wrap gap-x-3 gap-y-1">
+                <span
+                  v-for="(service, i) in project.services"
+                  :key="service"
+                  class="text-sm font-medium text-zinc-900"
+                >
+                  {{ service }}<span v-if="i < project.services.length - 1" class="text-zinc-300 ml-1">,</span>
+                </span>
+              </div>
+            </div>
+            <div class="border-t border-zinc-200" />
+          </div>
+        </div>
       </div>
     </section>
 
@@ -168,11 +187,15 @@ const { splitTextReveal, parallaxImage, clipReveal, lineDraw } = useAnimations()
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
 
-const { getProject, getNextProject, getPreviousProject } = useProjects()
+const { getProject, getNextProject, getPreviousProject, projects } = useProjects()
 
 const project = computed(() => getProject(slug.value))
 const nextProject = computed(() => getNextProject(slug.value))
 const previousProject = computed(() => getPreviousProject(slug.value))
+const projectIndex = computed(() => {
+  if (!project.value) return 0
+  return projects.value.findIndex((p) => p.slug === project.value!.slug)
+})
 
 const heroImageRef = ref<HTMLElement>()
 const heroImgEl = ref<HTMLElement>()
@@ -180,7 +203,7 @@ const metaRef = ref<HTMLElement>()
 const metaStripRef = ref<HTMLElement>()
 const descRef = ref<HTMLElement>()
 const projectTitleRef = ref<HTMLElement>()
-const metaLineRef = ref<HTMLElement>()
+const indexNumRef = ref<HTMLElement>()
 const backBtnRef = ref<HTMLElement>()
 const progressBarRef = ref<HTMLElement>()
 
@@ -290,6 +313,14 @@ function animateIn() {
         y: 0,
         duration: 0.6,
       }, '-=0.3')
+    }
+
+    // Index number
+    if (indexNumRef.value) {
+      tl.to(indexNumRef.value, {
+        opacity: 1,
+        duration: 1,
+      }, '-=0.5')
     }
 
     // Description
