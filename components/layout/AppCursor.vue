@@ -2,24 +2,29 @@
   <div
     v-if="!isTouchDevice"
     ref="cursorRef"
-    class="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
+    class="fixed top-0 left-0 pointer-events-none z-[9999]"
     :class="{ 'opacity-0': !visible }"
   >
-    <!-- Outer ring -->
+    <!-- Outer circle — grows on hover -->
     <div
-      ref="cursorOuterRef"
-      class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40 w-8 h-8 opacity-60"
+      ref="outerRef"
+      class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full will-change-transform"
+      :style="outerStyle"
     />
-    <!-- Inner dot -->
+
+    <!-- Inner dot — always centered -->
     <div
-      ref="cursorInnerRef"
-      class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-white w-1.5 h-1.5"
+      ref="innerRef"
+      class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-900 will-change-transform"
+      :style="innerStyle"
     />
-    <!-- Label -->
-    <Transition name="cursor-label">
+
+    <!-- Label text -->
+    <Transition name="label">
       <span
         v-if="label"
-        class="absolute -translate-x-1/2 -translate-y-1/2 text-white text-[10px] font-medium uppercase tracking-widest whitespace-nowrap"
+        class="absolute -translate-x-1/2 -translate-y-1/2 text-[10px] font-semibold uppercase tracking-[0.2em] whitespace-nowrap"
+        :class="labelDark ? 'text-zinc-900' : 'text-white'"
       >
         {{ label }}
       </span>
@@ -31,47 +36,69 @@
 import { gsap } from 'gsap'
 
 const cursorRef = ref<HTMLElement>()
-const cursorOuterRef = ref<HTMLElement>()
-const cursorInnerRef = ref<HTMLElement>()
+const outerRef = ref<HTMLElement>()
+const innerRef = ref<HTMLElement>()
 
 const visible = ref(false)
 const hovering = ref(false)
-const clicking = ref(false)
 const label = ref('')
+const labelDark = ref(false)
 const isTouchDevice = ref(true)
+
+// Sizes
+const DOT_SIZE = 8
+const RING_SIZE = 36
+const HOVER_SIZE = 80
+const CLICK_SCALE = 0.85
 
 let mouseX = 0
 let mouseY = 0
 
+const outerStyle = computed(() => ({
+  width: `${RING_SIZE}px`,
+  height: `${RING_SIZE}px`,
+  border: '1.5px solid rgba(24, 24, 27, 0.25)',
+  backgroundColor: 'transparent',
+}))
+
+const innerStyle = computed(() => ({
+  width: `${DOT_SIZE}px`,
+  height: `${DOT_SIZE}px`,
+}))
+
 onMounted(() => {
   isTouchDevice.value = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-
   if (isTouchDevice.value) return
 
+  // Event handlers
   const onMouseMove = (e: MouseEvent) => {
     mouseX = e.clientX
     mouseY = e.clientY
-    visible.value = true
+    if (!visible.value) visible.value = true
   }
 
   const onMouseDown = () => {
-    clicking.value = true
-    if (cursorOuterRef.value) {
-      gsap.to(cursorOuterRef.value, {
-        scale: 0.75,
-        duration: 0.15,
-        ease: 'power2.out',
-      })
+    if (outerRef.value) {
+      gsap.to(outerRef.value, { scale: CLICK_SCALE, duration: 0.1, ease: 'power2.out' })
+    }
+    if (innerRef.value) {
+      gsap.to(innerRef.value, { scale: 0.5, duration: 0.1, ease: 'power2.out' })
     }
   }
 
   const onMouseUp = () => {
-    clicking.value = false
-    if (cursorOuterRef.value) {
-      gsap.to(cursorOuterRef.value, {
-        scale: hovering.value ? 2 : 1,
+    if (outerRef.value) {
+      gsap.to(outerRef.value, {
+        scale: hovering.value ? 1 : 1,
         duration: 0.4,
-        ease: 'elastic.out(1, 0.5)',
+        ease: 'elastic.out(1, 0.4)',
+      })
+    }
+    if (innerRef.value) {
+      gsap.to(innerRef.value, {
+        scale: hovering.value ? 0 : 1,
+        duration: 0.3,
+        ease: 'power3.out',
       })
     }
   }
@@ -85,22 +112,33 @@ onMounted(() => {
   document.addEventListener('mouseenter', onMouseEnter)
   document.addEventListener('mouseleave', onMouseLeave)
 
-  // Detect interactive elements
-  const observer = new MutationObserver(() => {
-    setupHoverListeners()
-  })
-
+  // Hover detection
+  const observer = new MutationObserver(() => setupHoverListeners())
   observer.observe(document.body, { childList: true, subtree: true })
   setupHoverListeners()
 
-  // GSAP-powered lerp for cursor (smoother than manual RAF)
+  // Smooth cursor follow with different speeds for inner/outer
   gsap.ticker.add(() => {
-    if (cursorRef.value) {
-      gsap.to(cursorRef.value, {
+    if (!cursorRef.value) return
+
+    // Outer ring — smooth, laggy follow
+    if (outerRef.value) {
+      gsap.to(outerRef.value, {
         x: mouseX,
         y: mouseY,
-        duration: 0.5,
+        duration: 0.6,
         ease: 'power3.out',
+        overwrite: 'auto',
+      })
+    }
+
+    // Inner dot — snappy follow
+    if (innerRef.value) {
+      gsap.to(innerRef.value, {
+        x: mouseX,
+        y: mouseY,
+        duration: 0.15,
+        ease: 'power2.out',
         overwrite: 'auto',
       })
     }
@@ -117,32 +155,38 @@ onMounted(() => {
 })
 
 function setupHoverListeners() {
-  const interactiveElements = document.querySelectorAll('a, button, [data-cursor]')
+  const interactiveElements = document.querySelectorAll('a, button, [data-cursor], input, textarea')
 
   interactiveElements.forEach((el) => {
-    // Skip if already has listeners
-    if ((el as any).__cursorListenersSet) return
-    ;(el as any).__cursorListenersSet = true
+    if ((el as any).__cursorBound) return
+    ;(el as any).__cursorBound = true
 
     el.addEventListener('mouseenter', () => {
       hovering.value = true
       const cursorLabel = (el as HTMLElement).dataset.cursor
-      if (cursorLabel) label.value = cursorLabel
+      const isDark = (el as HTMLElement).dataset.cursorDark !== undefined
 
-      // Elastic scale up
-      if (cursorOuterRef.value) {
-        gsap.to(cursorOuterRef.value, {
-          scale: 2,
-          opacity: 1,
+      if (cursorLabel) {
+        label.value = cursorLabel
+        labelDark.value = isDark
+      }
+
+      if (outerRef.value) {
+        gsap.to(outerRef.value, {
+          width: cursorLabel ? HOVER_SIZE : 50,
+          height: cursorLabel ? HOVER_SIZE : 50,
+          borderColor: cursorLabel ? 'rgba(24, 24, 27, 0.9)' : 'rgba(24, 24, 27, 0.15)',
+          backgroundColor: cursorLabel ? 'rgba(24, 24, 27, 0.9)' : 'transparent',
           duration: 0.4,
-          ease: 'elastic.out(1, 0.5)',
+          ease: 'power3.out',
         })
       }
-      if (cursorInnerRef.value) {
-        gsap.to(cursorInnerRef.value, {
-          scale: 1.3,
-          duration: 0.3,
-          ease: 'power3.out',
+
+      if (innerRef.value) {
+        gsap.to(innerRef.value, {
+          scale: cursorLabel ? 0 : 0,
+          duration: 0.2,
+          ease: 'power2.out',
         })
       }
     })
@@ -151,16 +195,19 @@ function setupHoverListeners() {
       hovering.value = false
       label.value = ''
 
-      if (cursorOuterRef.value) {
-        gsap.to(cursorOuterRef.value, {
-          scale: 1,
-          opacity: 0.6,
+      if (outerRef.value) {
+        gsap.to(outerRef.value, {
+          width: RING_SIZE,
+          height: RING_SIZE,
+          borderColor: 'rgba(24, 24, 27, 0.25)',
+          backgroundColor: 'transparent',
           duration: 0.5,
-          ease: 'elastic.out(1, 0.4)',
+          ease: 'elastic.out(1, 0.5)',
         })
       }
-      if (cursorInnerRef.value) {
-        gsap.to(cursorInnerRef.value, {
+
+      if (innerRef.value) {
+        gsap.to(innerRef.value, {
           scale: 1,
           duration: 0.3,
           ease: 'power3.out',
@@ -172,14 +219,14 @@ function setupHoverListeners() {
 </script>
 
 <style scoped>
-.cursor-label-enter-active,
-.cursor-label-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+.label-enter-active,
+.label-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.cursor-label-enter-from,
-.cursor-label-leave-to {
+.label-enter-from,
+.label-leave-to {
   opacity: 0;
-  transform: translate(-50%, -50%) scale(0.8);
+  transform: translate(-50%, -50%) scale(0.7);
 }
 </style>

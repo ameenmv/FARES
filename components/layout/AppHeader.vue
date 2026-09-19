@@ -1,9 +1,9 @@
 <template>
   <header
     ref="headerRef"
-    class="fixed top-0 left-0 right-0 z-100 transition-all duration-500"
+    class="fixed top-0 left-0 right-0 z-100 transition-all duration-500 border-b"
     :class="[
-      scrolled && !mobileOpen ? 'bg-white/80 backdrop-blur-xl shadow-sm border-b border-zinc-100' : !mobileOpen ? 'bg-transparent' : '',
+      scrolled && !mobileOpen ? 'bg-white/80 backdrop-blur-xl shadow-sm border-zinc-100' : !mobileOpen ? 'bg-transparent border-transparent' : 'border-transparent',
       hidden && !mobileOpen ? '-translate-y-full' : 'translate-y-0'
     ]"
   >
