@@ -1,5 +1,6 @@
 <template>
   <div class="layout-default">
+    <NuxtLoadingIndicator :height="2" color="#18181b" />
     <LayoutAppPreloader @complete="onPreloaderComplete" />
     <LayoutAppHeader />
     <main>

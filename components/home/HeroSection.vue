@@ -36,9 +36,9 @@
 
     <!-- Scroll indicator -->
     <div ref="scrollIndicatorRef" class="absolute bottom-8 right-6 lg:right-12 flex items-center gap-3" style="opacity: 0">
-      <span class="text-[10px] uppercase tracking-widest text-zinc-400">Scroll</span>
-      <div class="w-5 h-8 rounded-full border border-zinc-300 flex items-start justify-center p-1.5">
-        <div ref="scrollDotRef" class="w-1 h-1 rounded-full bg-zinc-400" />
+      <span class="text-[10px] uppercase tracking-widest text-zinc-400 font-medium">Scroll</span>
+      <div class="w-[1px] h-12 bg-zinc-200 relative overflow-hidden rounded-full">
+        <div ref="scrollDotRef" class="absolute top-0 left-0 w-full h-4 bg-zinc-900 rounded-full" />
       </div>
     </div>
   </section>
@@ -96,11 +96,11 @@ function startAnimations() {
     duration: 0.6,
   }, '-=0.4')
 
-  // Scroll dot bounce
+  // Scroll line animation
   if (scrollDotRef.value) {
     gsap.to(scrollDotRef.value, {
-      y: 8,
-      duration: 1,
+      y: 32,
+      duration: 1.2,
       repeat: -1,
       yoyo: true,
       ease: 'power2.inOut',
