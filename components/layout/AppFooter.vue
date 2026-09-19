@@ -65,12 +65,9 @@
       </div>
 
       <!-- Bottom Bar -->
-      <div class="py-6 border-t border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-4">
-        <p class="text-zinc-600 text-sm">
+      <div class="py-6 border-t border-zinc-800 flex items-center justify-center">
+        <p class="text-zinc-600 text-sm text-center">
           &copy; {{ new Date().getFullYear() }} Fares Mohammed. All rights reserved.
-        </p>
-        <p class="text-zinc-700 text-xs">
-          Designed with passion
         </p>
       </div>
     </div>
