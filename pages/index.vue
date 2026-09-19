@@ -8,7 +8,12 @@
 </template>
 
 <script setup lang="ts">
-useHead({
-  title: 'Home',
+useSeoMeta({
+  title: 'Fares Mohammed — Senior Graphic Designer',
+  ogTitle: 'Fares Mohammed — Senior Graphic Designer',
+  description: 'Visual Storyteller & Senior Graphic Designer with 6+ years of experience in branding, packaging, and campaign design across Egypt and Saudi Arabia.',
+  ogDescription: 'Visual Storyteller & Senior Graphic Designer with 6+ years of experience in branding, packaging, and campaign design.',
+  ogImage: 'https://faresmohammed.com/og-image.jpg',
+  twitterCard: 'summary_large_image',
 })
 </script>

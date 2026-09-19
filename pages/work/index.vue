@@ -95,8 +95,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const { splitTextReveal, lineDraw } = useAnimations()
 
-useHead({
-  title: 'Work',
+useSeoMeta({
+  title: 'Work — Fares Mohammed',
+  ogTitle: 'Work — Fares Mohammed',
+  description: 'Explore the portfolio of Fares Mohammed — branding, packaging, campaign design, and visual identity projects for leading brands.',
+  ogDescription: 'Branding, packaging, and campaign design portfolio.',
+  ogImage: 'https://faresmohammed.com/og-image.jpg',
+  twitterCard: 'summary_large_image',
 })
 
 const { allProjects, brandingProjects, campaignProjects } = useProjects()

@@ -168,8 +168,13 @@ import { gsap } from 'gsap'
 
 const { splitTextReveal, magneticElement, lineDraw } = useAnimations()
 
-useHead({
-  title: 'Contact',
+useSeoMeta({
+  title: 'Contact — Fares Mohammed',
+  ogTitle: 'Contact — Fares Mohammed',
+  description: 'Get in touch with Fares Mohammed for branding, packaging, campaign design, and creative direction projects.',
+  ogDescription: 'Get in touch for branding, packaging, and campaign design projects.',
+  ogImage: 'https://faresmohammed.com/og-image.jpg',
+  twitterCard: 'summary_large_image',
 })
 
 const headerRef = ref<HTMLElement>()
