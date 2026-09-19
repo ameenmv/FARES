@@ -14,7 +14,7 @@
         <h1
           ref="titleRef"
           class="font-heading font-bold text-zinc-900 leading-[0.9] tracking-[-0.03em] mb-8"
-          style="font-size: clamp(2.5rem, 5.5vw, 6rem); visibility: hidden; white-space: nowrap"
+          style="font-size: clamp(2rem, 5.5vw, 6rem); visibility: hidden"
         >
           Let's start a project together
         </h1>
