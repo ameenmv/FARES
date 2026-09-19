@@ -31,7 +31,7 @@
       </div>
 
       <!-- Thin divider line -->
-      <div ref="lineRef" class="h-[1px] bg-zinc-900 mt-6 md:mt-8" />
+      <div ref="lineRef" class="h-[1px] bg-zinc-900 mt-6 md:mt-8 origin-left" style="transform: scaleX(0)" />
     </div>
 
     <!-- Scroll indicator -->
