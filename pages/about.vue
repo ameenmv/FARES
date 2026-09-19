@@ -15,7 +15,7 @@ useSeoMeta({
   ogTitle: 'About — Fares Mohammed',
   description: 'Learn about Fares Mohammed — a Senior Graphic Designer with 6+ years crafting brand identities, packaging, and campaigns for leading brands in Egypt and Saudi Arabia.',
   ogDescription: 'Senior Graphic Designer with 6+ years crafting brand identities, packaging, and campaigns.',
-  ogImage: 'https://faresmohammed.com/og-image.jpg',
+  ogImage: 'https://faresmohammed.vercel.app/og-image.jpg',
   twitterCard: 'summary_large_image',
 })
 </script>

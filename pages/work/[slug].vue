@@ -227,7 +227,7 @@ useSeoMeta({
   ogTitle: computed(() => `${project.value?.title || 'Project'} — Fares Mohammed`),
   description: computed(() => project.value?.description || 'A design project by Fares Mohammed'),
   ogDescription: computed(() => project.value?.description || 'A design project by Fares Mohammed'),
-  ogImage: 'https://faresmohammed.com/og-image.jpg',
+  ogImage: 'https://faresmohammed.vercel.app/og-image.jpg',
   twitterCard: 'summary_large_image',
 })
 
