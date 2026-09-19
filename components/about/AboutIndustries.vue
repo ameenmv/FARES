@@ -1,5 +1,5 @@
 <template>
-  <section class="py-28 border-t border-zinc-200 overflow-hidden">
+  <section class="pt-28 border-t border-zinc-200 overflow-hidden">
     <!-- Header -->
     <div class="container mx-auto px-6 lg:px-12 mb-20">
       <h2 ref="labelRef" class="text-3xl md:text-4xl font-heading font-semibold text-zinc-900" style="opacity: 0; transform: translateY(20px)">
@@ -28,8 +28,8 @@
           <div class="flex items-center justify-between py-6 md:py-8">
             <!-- Number -->
             <span
-              class="text-xs font-medium tabular-nums mr-6 md:mr-10 transition-colors duration-500 flex-shrink-0"
-              :class="activeIndex === index ? 'text-zinc-500' : 'text-zinc-300'"
+              class="text-sm font-medium tabular-nums mr-6 md:mr-10 transition-colors duration-500 flex-shrink-0"
+              :class="activeIndex === index ? 'text-zinc-400' : 'text-zinc-500'"
             >
               ({{ String(index + 1).padStart(2, '0') }})
             </span>
@@ -38,7 +38,7 @@
             <h3
               class="flex-1 font-heading font-bold tracking-[-0.03em] leading-none transition-all duration-500"
               :class="activeIndex === index ? 'text-white' : 'text-zinc-900'"
-              :style="{ fontSize: 'clamp(2rem, 5vw, 4.5rem)' }"
+              :style="{ fontSize: 'clamp(1.5rem, 3.5vw, 3rem)' }"
             >
               <span class="inline-block transition-transform duration-500" :class="activeIndex === index ? 'translate-x-4' : 'translate-x-0'">
                 {{ industry.name }}
